@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Textarea } from "@/components/ui/textarea"
-
+import { ImSpinner8 } from "react-icons/im";
 import { createEvent } from "@/actions/events"
 import { startTransition, useActionState } from "react"
 
@@ -67,7 +67,9 @@ const AddEvent = () => {
                 <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex flex-row-reverse">
                         <Button className="ml-2.5" disabled={isPending}>Cancel</Button>
-                        <Button className="mr-2.5" type="submit" disabled={isPending}>Add</Button>
+                        <Button className="mr-2.5" type="submit" disabled={isPending}>
+                            {isPending ? <ImSpinner8 /> : "Add"}
+                        </Button>
                     </div>
 
                     <FormField

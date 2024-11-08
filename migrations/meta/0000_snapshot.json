@@ -1,0 +1,63 @@
+{
+  "id": "a8d92312-202b-409d-8df5-d1b345b94fdb",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.events": {
+      "name": "events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "eventName": {
+          "name": "eventName",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastDateOfRegistration": {
+          "name": "lastDateOfRegistration",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastDateOfProjectSubmission": {
+          "name": "lastDateOfProjectSubmission",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requirements": {
+          "name": "requirements",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

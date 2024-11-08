@@ -1,0 +1,28 @@
+import {
+    Card,
+    CardContent,
+} from "@/components/ui/card"
+import Link from "next/link";
+import { IoMdAddCircleOutline } from "react-icons/io";
+
+type AddItemCardProp = {
+    href: string
+}
+
+const AddItemCard = (props: AddItemCardProp) => {
+
+    return (
+
+        <Card className="flex flex-col">
+            <CardContent className="grow flex items-center justify-center">
+                <Link href={props.href} className="">
+                    <IoMdAddCircleOutline className="w-20 h-20" />
+                </Link>
+            </CardContent>
+        </Card>
+
+    )
+
+}
+
+export default AddItemCard;

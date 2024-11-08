@@ -11,7 +11,7 @@ export default function DashboardLayout({
         <div className="h-screen flex">
             <SidebarProvider>
               <AppSidebar userRole="event-organizer"/>
-              <div className="grow bg-red-200 flex flex-col">
+              <div className="grow flex flex-col">
                 <Navbar/>
                 {children}
               </div>

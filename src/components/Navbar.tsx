@@ -10,14 +10,13 @@ import {
 import { cn } from "@/lib/utils";
 import Searchbar from "./Searchbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import NavbarTitle from "./NavbarTitle";
 
 
 const Navbar = () => {
     return (
         <div className=" py-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-800 px-4">
-                Events
-            </h1>
+            <NavbarTitle/>
             <Menubar className="px-4">
                 <MenubarMenu>
                     <MenubarTrigger>

@@ -22,7 +22,7 @@ const Events = async () => {
                 {
                     events.map((item, index) => (
                         <ItemCard
-                            key={item.id}
+                            key={ Math.floor(Math.random() * 9231)}
                             title={item.eventName}
                         />
                     ))

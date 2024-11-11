@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/card"
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { role } from "@/lib/data";
 
 type ItemProps = {
     title: string,
     description?: string,
     content?: string,
     path: string,
-    role?: string,
 }
 
 const ItemCard = (props: ItemProps) => {
@@ -31,7 +31,7 @@ const ItemCard = (props: ItemProps) => {
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
-                {props.role === "event-organizer" ? <Button variant={"destructive"}>delete</Button>: <></>}
+                {role === "event-organizer" ? <Button variant={"destructive"}>delete</Button>: <></>}
             </CardFooter>
         </Card>
 

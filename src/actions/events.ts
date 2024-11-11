@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
 import { db } from "@/db/drizzle";
 import { events } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export async function createEvent(previousState: any, formData: FormData) {
 
@@ -19,7 +19,7 @@ export async function createEvent(previousState: any, formData: FormData) {
     
 
   if (!result.success) {
-      return JSON.stringify(result.error.issues)
+    return new Error(result.error.issues[0].message);
   }
 
   const event: Event = {
@@ -31,7 +31,7 @@ export async function createEvent(previousState: any, formData: FormData) {
   const eventId = await db.insert(events).values(event).returning({id: events.id});
 
   if(eventId.length === 0) {
-    return JSON.stringify({message: "can not create event"});
+    return new Error("Can not create event");
   }
 
   revalidatePath('/events');
@@ -39,18 +39,53 @@ export async function createEvent(previousState: any, formData: FormData) {
 
 }
 
-export async function getEvents() {
-  const events: Event[] = await db.query.events.findMany({
-    columns: {id: false}
+export async function updateEvent(previousState: any, formData: FormData) {
+
+  const result = Event.safeParse({
+    id: formData.get('id'),
+    eventName: formData.get('eventName'), 
+    lastDateOfRegistration: new Date(formData.get('lastDateOfRegistration') as string), 
+    lastDateOfProjectSubmission: new Date(formData.get('lastDateOfProjectSubmission') as string), 
+    requirements: formData.get('requirements')
   });
+  
+
+  if (!result.success) {
+    return new Error(result.error.issues[0].message);
+  }
+
+
+  const eventId = await db.update(events)
+    .set(result.data)
+    .where(eq(events.id,result.data.id as string))
+    .returning({id: events.id});
+
+  if(eventId.length === 0) {
+    return new Error("no event found");
+  }
+
+  revalidatePath('/events');
+  redirect('/events');
+}
+
+export async function getEvents() {
+  const events: Event[] = await db.query.events.findMany();
 
   return events;
 }
 
-export async function getEvent(eventId: string) {
-  const result: Event[] = await db.select().from(events).where(sql`${events.id} = ${eventId}`)
+export async function getEvent(eventId: string):Promise<[Error | null, Event[] | null]>  {
 
-  const id = result[0].id;
+  let error: Error | null = null;
+  let result: Event[] | null = null;
+
+  result = await db.select().from(events).where(sql`${events.id} = ${eventId}`)
+
+  if (result.length === 0) {
+    error = new Error("no event found");
+  }
+
+  return [error,result]
   
 }
 

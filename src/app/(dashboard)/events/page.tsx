@@ -22,8 +22,7 @@ const Events = async () => {
                         <ItemCard
                             key={ Math.floor(Math.random() * 9231)}
                             title={item.eventName}
-                            role={"event-organizer"}
-                            path={`/events/${item.id}`}
+                            path={`/events/${item.id? item.id: ""}`}
                         />
                     ))
                 }

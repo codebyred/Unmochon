@@ -10,17 +10,18 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 
 type ItemProps = {
-    title?: string,
+    title: string,
     description?: string,
     content?: string,
-    path?: string
+    path: string,
+    role?: string,
 }
 
 const ItemCard = (props: ItemProps) => {
 
     return (
 
-        <Card>
+        <Card className="flex flex-col justify-between">
             <CardHeader>
                 <CardTitle>{props.title}</CardTitle>
                 <CardDescription>{props.description}</CardDescription>
@@ -28,8 +29,9 @@ const ItemCard = (props: ItemProps) => {
             <CardContent>
                 {props.content && <p>{props.content}</p>}
             </CardContent>
-            <CardFooter>
-                {props.path && <Button asChild><Link href='path'>view</Link></Button>}
+            <CardFooter className="flex items-center flex-end gap-4">
+                <Button asChild><Link href={props.path}>view</Link></Button>
+                {props.role === "event-organizer" ? <Button variant={"destructive"}>delete</Button>: <></>}
             </CardFooter>
         </Card>
 

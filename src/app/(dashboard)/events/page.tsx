@@ -1,9 +1,7 @@
 import Add from "@/components/Add";
 import { getEvents } from "@/actions/events";
 import ItemCard from "@/components/ItemCard"
-import { Event } from "@/lib/types";
-import { MouseEvent } from "react";
-import { IoMdAddCircleOutline } from "react-icons/io";
+import { Event } from "@/db/schema";
 import AddItemCard from "@/components/AddItemCard";
 
 const Events = async () => {
@@ -24,6 +22,8 @@ const Events = async () => {
                         <ItemCard
                             key={ Math.floor(Math.random() * 9231)}
                             title={item.eventName}
+                            role={"event-organizer"}
+                            path={`/events/${item.id}`}
                         />
                     ))
                 }

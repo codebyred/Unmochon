@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link";
+import { role } from "@/lib/data";
 
 const sidebarItems = [
     {
         icon:"",
         label:"Home",
-        href:"/event-organizer",
+        href:"/Home",
         visible:["event-organizer", "faculty", "student"]
     },
     {
@@ -58,7 +59,7 @@ const AppSidebar = ({className, userRole}:SidebarProps) => {
 
                         >
                             <SidebarMenuButton asChild>
-                                <Link href={item.label === "Home" && userRole === "event-organizer"?"/event-organizer":item.href}>{item.label}</Link>
+                                <Link href={item.href}>{item.label}</Link>
                             </SidebarMenuButton>           
                         </SidebarMenuItem>
                     ))

@@ -15,7 +15,7 @@ const AddItemCard = (props: AddItemCardProp) => {
 
         <Card className="flex flex-col">
             <CardContent className="grow flex items-center justify-center">
-                <Link href={props.href} className="">
+                <Link href={props.href} data-cy="add-event-card">
                     <IoMdAddCircleOutline className="w-20 h-20" />
                 </Link>
             </CardContent>

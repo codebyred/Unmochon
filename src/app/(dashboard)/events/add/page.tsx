@@ -14,7 +14,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Event } from "@/lib/types"
+import { Event } from "@/db/schema"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
@@ -23,8 +23,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImSpinner8 } from "react-icons/im";
 import { createEvent } from "@/actions/events"
 import { startTransition, useActionState } from "react"
+import { useRouter } from "next/navigation"
 
 const AddEvent = () => {
+
+    const router = useRouter();
 
     const form = useForm<Event>({
         resolver: zodResolver(Event),
@@ -55,19 +58,27 @@ const AddEvent = () => {
             formData.append(key, value);
         }
 
-        startTransition(async ()=>
+        startTransition(async () =>
             await formAction(formData)
         );
-        
+
     }
 
     return (
-        <div className="px-4">
+        <div className="px-4" data-cy="addEvent-page">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex flex-row-reverse">
-                        <Button className="ml-2.5" disabled={isPending}>Cancel</Button>
-                        <Button className="mr-2.5" type="submit" disabled={isPending}>
+                        <Button
+                            className="ml-2.5"
+                            variant={'destructive'}
+                            type="button"
+                            disabled={isPending}
+                            onClick={(e)=> router.back()}
+                        >
+                            Cancel
+                        </Button>
+                        <Button className="mr-2.5" type="submit" disabled={isPending} data-cy="addEvent-btn">
                             {isPending ? <ImSpinner8 /> : "Add"}
                         </Button>
                     </div>
@@ -79,7 +90,7 @@ const AddEvent = () => {
                             <FormItem className="flex flex-col grow">
                                 <FormLabel>Event name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="shadcn" {...field} />
+                                    <Input placeholder="shadcn" {...field} data-cy="eventName" />
                                 </FormControl>
                                 <FormDescription>
 
@@ -104,6 +115,7 @@ const AddEvent = () => {
                                                         "w-[240px] pl-3 text-left font-normal",
                                                         !field.value && "text-muted-foreground"
                                                     )}
+                                                    data-cy="registration-date-btn"
                                                 >
                                                     {field.value ? (
                                                         format(field.value, "PPP")
@@ -147,6 +159,7 @@ const AddEvent = () => {
                                                         "w-[240px] pl-3 text-left font-normal",
                                                         !field.value && "text-muted-foreground"
                                                     )}
+                                                    data-cy="projectSubmission-date-btn"
                                                 >
                                                     {field.value ? (
                                                         format(field.value, "PPP")
@@ -187,6 +200,7 @@ const AddEvent = () => {
                                         placeholder=""
                                         className="resize-none"
                                         {...field}
+                                        data-cy="requirements"
                                     />
                                 </FormControl>
                                 <FormDescription>

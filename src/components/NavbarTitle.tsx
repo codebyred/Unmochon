@@ -8,17 +8,18 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation"
 
 
-const NavbarTitle = () => {
+const NavbarTitle = ({className}:{className?:string}) => {
 
     const pathname = usePathname();
 
     const pathSegments = pathname.split('/').filter(Boolean);
 
     return (
-        <Breadcrumb className="px-4">
+        <Breadcrumb className={cn("px-4", className)}>
             <BreadcrumbList>{
                 pathSegments.map((path) => (
                     <div key={Math.floor(Math.random() * 1000)} className="flex items-center justify-center">

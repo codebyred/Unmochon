@@ -10,14 +10,15 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { role } from "@/lib/data";
 
-type ItemProps = {
+type EventItemProps = {
     title: string,
     description?: string,
-    content?: string,
+    lastDateOfRegistration: Date,
+    lastDateOfProjectSubmission: Date,
     path: string,
 }
 
-const ItemCard = (props: ItemProps) => {
+const EventItem = (props: EventItemProps) => {
 
     return (
 
@@ -26,8 +27,9 @@ const ItemCard = (props: ItemProps) => {
                 <CardTitle>{props.title}</CardTitle>
                 <CardDescription>{props.description}</CardDescription>
             </CardHeader>
-            <CardContent>
-                {props.content && <p>{props.content}</p>}
+            <CardContent className="text-red-500">
+                
+                {props.lastDateOfRegistration && `last day to register: ${props.lastDateOfProjectSubmission.toDateString()}` }
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
@@ -38,4 +40,4 @@ const ItemCard = (props: ItemProps) => {
     )
 }
 
-export default ItemCard;
+export default EventItem;

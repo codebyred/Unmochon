@@ -1,8 +1,8 @@
 import Add from "@/components/Add";
 import { getEvents } from "@/actions/events";
-import ItemCard from "@/components/ItemCard"
 import { Event } from "@/db/schema";
 import AddItemCard from "@/components/AddItemCard";
+import EventCard from "@/components/EventCard";
 
 const Events = async () => {
 
@@ -19,9 +19,11 @@ const Events = async () => {
             <div className="px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {
                     events.map((item, index) => (
-                        <ItemCard
+                        <EventCard
                             key={ Math.floor(Math.random() * 9231)}
                             title={item.eventName}
+                            lastDateOfProjectSubmission={item.lastDateOfProjectSubmission}
+                            lastDateOfRegistration={item.lastDateOfRegistration}
                             path={`/events/${item.id? item.id: ""}`}
                         />
                     ))

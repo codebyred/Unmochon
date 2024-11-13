@@ -9,8 +9,10 @@ import {
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { role } from "@/lib/data";
+import DeleteButton from "./DeleteButton";
 
 type EventItemProps = {
+    id: string
     title: string,
     description?: string,
     lastDateOfRegistration: Date,
@@ -28,12 +30,14 @@ const EventItem = (props: EventItemProps) => {
                 <CardDescription>{props.description}</CardDescription>
             </CardHeader>
             <CardContent className="text-red-500">
-                
-                {props.lastDateOfRegistration && `last day to register: ${props.lastDateOfProjectSubmission.toDateString()}` }
+                {props.lastDateOfRegistration && `last day to register: ${props.lastDateOfProjectSubmission.toDateString()}`}
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
-                {role === "event-organizer" ? <Button variant={"destructive"}>delete</Button>: <></>}
+                {role === "event-organizer"
+                    ?
+                    <DeleteButton itemId={props.id}/>
+                    : <></>}
             </CardFooter>
         </Card>
 

@@ -89,3 +89,16 @@ export async function getEvent(eventId: string):Promise<[Error | null, Event[] |
   
 }
 
+export async function deleteEvent(eventId: string){
+
+
+  const result = await db.delete(events).where(sql`${events.id} = ${eventId}`).returning()
+
+  if (result.length === 0) {
+    return new Error("Could not delete event");
+  }
+
+  revalidatePath('/events');
+  
+}
+

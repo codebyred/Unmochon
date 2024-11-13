@@ -21,6 +21,7 @@ const Events = async () => {
                     events.map((item, index) => (
                         <EventCard
                             key={ Math.floor(Math.random() * 9231)}
+                            id={item.id as string}
                             title={item.eventName}
                             lastDateOfProjectSubmission={item.lastDateOfProjectSubmission}
                             lastDateOfRegistration={item.lastDateOfRegistration}

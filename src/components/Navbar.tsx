@@ -13,9 +13,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import NavbarTitle from "./NavbarTitle";
 
 
-const Navbar = () => {
+const Navbar = ({className}:{className?:string}) => {
     return (
-        <div className=" py-6 flex justify-between items-center">
+        <div className={cn(className,"py-3 flex justify-between items-center shadow-[0px_1px_4px_rgba(0,0,0,0.16)] p-6 bg-white")}>
             <NavbarTitle/>
             <Menubar className="px-4">
                 <MenubarMenu>

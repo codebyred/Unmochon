@@ -14,13 +14,20 @@ describe('template spec', () => {
 
     cy.get('[data-cy="registration-date-btn"]').click();
 
-    cy.get('button[name="day"]').contains('12').click();
+    // select date
+
+    const today = new Date();
+    const registrationDate = today.getDate() + 2;
+    const projectSubMissionDate = today.getDate() + 4
+    
+
+    cy.get('button[name="day"]').contains(`${registrationDate}`).click();
 
     cy.get('[data-cy="requirements"]').type("mysql, php, html");
 
     cy.get('[data-cy="projectSubmission-date-btn"]').click();
 
-    cy.get('button[name="day"]').contains('24').click();
+    cy.get('button[name="day"]').contains(`${projectSubMissionDate}`).click();
 
     cy.get('[data-cy="addEvent-btn"]').click();
 

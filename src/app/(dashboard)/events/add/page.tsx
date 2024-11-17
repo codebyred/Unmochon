@@ -1,8 +1,8 @@
-import EventForm from "@/components/EventForm"
+import AddEventForm from "@/components/AddEventForm"
 
 const AddEvent = () => {
 
-    return <EventForm variant="add"/>
+    return <AddEventForm/>
    
 }
 

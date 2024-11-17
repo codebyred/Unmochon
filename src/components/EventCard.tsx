@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { role } from "@/lib/data";
 import DeleteButton from "./DeleteButton";
+import { hasPermission } from "@/lib/auth";
 
 type EventItemProps = {
     id: string
@@ -34,10 +35,9 @@ const EventItem = (props: EventItemProps) => {
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
-                {role === "event-organizer"
-                    ?
-                    <DeleteButton itemId={props.id}/>
-                    : <></>}
+                {
+                    hasPermission(role, "delete:events") && <DeleteButton itemId={props.id} />
+                }
             </CardFooter>
         </Card>
 

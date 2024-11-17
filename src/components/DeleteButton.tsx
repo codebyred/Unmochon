@@ -18,7 +18,6 @@ type DeleteButtonProps = {
 
 const DeleteButton = (props: DeleteButtonProps) => {
 
-
     return (
         <Dialog>
             <DialogTrigger asChild>

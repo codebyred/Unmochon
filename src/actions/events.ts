@@ -95,10 +95,13 @@ export async function deleteEvent(eventId: string){
   const result = await db.delete(events).where(sql`${events.id} = ${eventId}`).returning()
 
   if (result.length === 0) {
-    return new Error("Could not delete event");
+    const error = encodeURIComponent("Could not delete event");
+    redirect(`/events?error=${error}`);
   }
 
+  const success = encodeURIComponent("Event deleted successfully");
   revalidatePath('/events');
-  
+  redirect(`/events?success=${success}`);
+
 }
 

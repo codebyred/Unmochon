@@ -17,7 +17,7 @@ const sidebarItems = [
     {
         icon:"",
         label:"Home",
-        href:"/Home",
+        href:"/home",
         visible:["event-organizer", "faculty", "student"]
     },
     {
@@ -30,15 +30,25 @@ const sidebarItems = [
         icon:"",
         label:"Announcements",
         href:"/announcements",
-        visible:["event-organizer", "faculty", "student"]
+        visible:["event-organizer"]
     },
+    {
+        icon:"",
+        label: "Evaluation",
+        href:"/evaluation",
+        visible: ["event-organizer", "faculty"]
+    },
+    {
+        icon:"",
+        label: "Teams",
+        href:"/teams",
+        visible: ["student", "event-organizer", "faculty"]
+    }
 ]
 
-type SidebarProps = Partial<React.ButtonHTMLAttributes<HTMLButtonElement>> & {
-    userRole: string
-}
+type SidebarProps = React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const AppSidebar = ({className, userRole}:SidebarProps) => {
+const AppSidebar = ({className}:SidebarProps) => {
     return (
         <Sidebar className={cn("flex flex-col", className)}>
             <SidebarHeader className={cn("h-[20%] flex items-center justify-center")}>
@@ -53,6 +63,7 @@ const AppSidebar = ({className, userRole}:SidebarProps) => {
                 <SidebarMenu>
                 {
                     sidebarItems.map((item, index)=>(
+                        item.visible.includes(role) &&
                         <SidebarMenuItem
                             className={cn("px-4 py-2")}
                             key={(index+1) * 1000}

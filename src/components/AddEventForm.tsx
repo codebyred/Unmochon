@@ -27,48 +27,23 @@ import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
-type EventFormProps = {
-    variant: "update" | "add"
-    eventName?: string
-    id?: string
-    lastDateOfRegistration?: Date
-    lastDateOfProjectSubmission?: Date
-    requirements?: string
-}
 
-const EventForm = (props: EventFormProps) => {
+const AddEventForm = () => {
 
     const router = useRouter();
     const { toast } = useToast();
 
     const form = useForm<Event>({
         resolver: zodResolver(Event),
-        defaultValues: props.variant === "add"
-            ?
-            {
-                eventName: "",
-                lastDateOfRegistration: new Date(),
-                lastDateOfProjectSubmission: new Date(),
-                requirements: ""
-            }
-            :
-            {
-                id: props.id ? props.id : "",
-                eventName: props.eventName ? props.eventName : "",
-                lastDateOfRegistration: props.lastDateOfRegistration ? props.lastDateOfRegistration : new Date(),
-                lastDateOfProjectSubmission: props.lastDateOfProjectSubmission ? props.lastDateOfProjectSubmission : new Date(),
-                requirements: props.requirements ? props.requirements : ""
-            }
-        ,
-    });
+        defaultValues: {
+            eventName: "",
+            lastDateOfRegistration: new Date(),
+            lastDateOfProjectSubmission: new Date(),
+            requirements: ""
+        }
+    })
 
-
-    const [error, formAction, isPending] =
-        props.variant === "add"
-            ?
-            useActionState(createEvent, null)
-            :
-            useActionState(updateEvent, null);
+    const [error, formAction, isPending] = useActionState(createEvent, null)
 
     useEffect(()=>{
         if(error)
@@ -79,7 +54,6 @@ const EventForm = (props: EventFormProps) => {
     async function onSubmit(values: Event) {
 
         const event = {
-            id: props.id ? props.id : "",
             lastDateOfRegistration: values.lastDateOfRegistration.toISOString().split('T')[0],
             lastDateOfProjectSubmission: values.lastDateOfProjectSubmission.toISOString().split('T')[0],
             eventName: values.eventName,
@@ -113,27 +87,15 @@ const EventForm = (props: EventFormProps) => {
                         >
                             Cancel
                         </Button>
-                        {
-                            props.variant === "add"
-                                ?
-                                <Button
-                                    className="mr-2.5"
-                                    type="submit"
-                                    disabled={isPending}
-                                    data-cy="addEvent-btn"
-                                >
-                                    {isPending ? <ImSpinner8 /> : "Add"}
-                                </Button>
-                                :
-                                <Button
-                                    className="mr-2.5"
-                                    type="submit"
-                                    disabled={isPending}
-                                    data-cy="addEvent-btn"
-                                >
-                                    {isPending ? <ImSpinner8 /> : "Update"}
-                                </Button>
-                        }
+
+                        <Button
+                            className="mr-2.5"
+                            type="submit"
+                            disabled={isPending}
+                            data-cy="addEvent-btn"
+                        >
+                            {isPending ? <ImSpinner8 /> : "Add"}
+                        </Button>
 
                     </div>
 
@@ -270,4 +232,4 @@ const EventForm = (props: EventFormProps) => {
     );
 }
 
-export default EventForm;
+export default AddEventForm;

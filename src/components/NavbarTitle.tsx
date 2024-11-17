@@ -10,13 +10,21 @@ import {
 } from "@/components/ui/breadcrumb"
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation"
-
+import { validate as isUuid } from "uuid";
 
 const NavbarTitle = ({className}:{className?:string}) => {
 
     const pathname = usePathname();
 
-    const pathSegments = pathname.split('/').filter(Boolean);
+    const pathSegments = pathname
+        .split("/")
+        .filter(segment => {
+            return (
+                segment &&
+                !isUuid(segment) && // Use `uuid` package to check if the segment is a UUID
+                !["error", "success"].includes(segment) // Filter out "error" and "success"
+            );
+        });
 
     return (
         <Breadcrumb className={cn("px-4", className)}>

@@ -14,7 +14,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Event } from "@/db/schema"
+import { InsertEventSchema } from "@/db/schema"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
@@ -33,8 +33,8 @@ const AddEventForm = () => {
     const router = useRouter();
     const { toast } = useToast();
 
-    const form = useForm<Event>({
-        resolver: zodResolver(Event),
+    const form = useForm<InsertEventSchema>({
+        resolver: zodResolver(InsertEventSchema),
         defaultValues: {
             eventName: "",
             lastDateOfRegistration: new Date(),
@@ -51,7 +51,7 @@ const AddEventForm = () => {
     }, [error]);
 
 
-    async function onSubmit(values: Event) {
+    async function onSubmit(values: InsertEventSchema) {
 
         const event = {
             lastDateOfRegistration: values.lastDateOfRegistration.toISOString().split('T')[0],
@@ -73,7 +73,7 @@ const AddEventForm = () => {
     }
 
     return (
-        <div className="px-4" data-cy="addEvent-page">
+        <>
             <Form {...form}>
                 <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex flex-row-reverse">
@@ -228,7 +228,7 @@ const AddEventForm = () => {
                 </form>
             </Form>
             <Toaster/>
-        </div>
+        </>
     );
 }
 

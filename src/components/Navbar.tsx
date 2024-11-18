@@ -15,9 +15,9 @@ import NavbarTitle from "./NavbarTitle";
 
 const Navbar = ({className}:{className?:string}) => {
     return (
-        <div className={cn(className,"py-3 flex justify-between items-center shadow-[0px_1px_4px_rgba(0,0,0,0.16)] p-6 bg-white")}>
+        <div className={cn(className,"flex justify-between items-center shadow-[0px_1px_4px_rgba(0,0,0,0.16)] p-6 bg-white")}>
             <NavbarTitle/>
-            <Menubar className="px-4">
+            <Menubar>
                 <MenubarMenu>
                     <MenubarTrigger>
                         <Avatar>

@@ -1,6 +1,6 @@
 "use server"
 
-import { Event } from "@/db/schema"
+import { InsertEventSchema } from "@/db/schema"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,7 @@ import { eq, sql } from "drizzle-orm";
 
 export async function createEvent(previousState: any, formData: FormData) {
 
-  const result = Event.safeParse({
+  const result = InsertEventSchema.safeParse({
       eventName: formData.get('eventName'), 
       lastDateOfRegistration: new Date(formData.get('lastDateOfRegistration') as string), 
       lastDateOfProjectSubmission: new Date(formData.get('lastDateOfProjectSubmission') as string), 
@@ -22,7 +22,7 @@ export async function createEvent(previousState: any, formData: FormData) {
     return new Error(result.error.issues[0].message);
   }
 
-  const event: Event = {
+  const event: InsertEventSchema = {
       id: uuidv4(),
       ...result.data
   };
@@ -41,7 +41,7 @@ export async function createEvent(previousState: any, formData: FormData) {
 
 export async function updateEvent(previousState: any, formData: FormData) {
 
-  const result = Event.safeParse({
+  const result = InsertEventSchema.safeParse({
     id: formData.get('id'),
     eventName: formData.get('eventName'), 
     lastDateOfRegistration: new Date(formData.get('lastDateOfRegistration') as string), 
@@ -69,15 +69,15 @@ export async function updateEvent(previousState: any, formData: FormData) {
 }
 
 export async function getEvents() {
-  const events: Event[] = await db.query.events.findMany();
+  const events: InsertEventSchema[] = await db.query.events.findMany();
 
   return events;
 }
 
-export async function getEvent(eventId: string):Promise<[Error | null, Event[] | null]>  {
+export async function getEvent(eventId: string):Promise<[Error | null, InsertEventSchema[] | null]>  {
 
   let error: Error | null = null;
-  let result: Event[] | null = null;
+  let result: InsertEventSchema[] | null = null;
 
   result = await db.select().from(events).where(sql`${events.id} = ${eventId}`)
 

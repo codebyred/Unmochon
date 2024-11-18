@@ -14,7 +14,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Event } from "@/db/schema"
+import { InsertEventSchema } from "@/db/schema"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
@@ -41,8 +41,8 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
     const router = useRouter();
     const { toast } = useToast();
 
-    const form = useForm<Event>({
-        resolver: zodResolver(Event),
+    const form = useForm<InsertEventSchema>({
+        resolver: zodResolver(InsertEventSchema),
         defaultValues: 
             {
                 id: props.id.length >= 0 ? props.id : "",
@@ -63,7 +63,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
     }, [error]);
 
 
-    async function onSubmit(values: Event) {
+    async function onSubmit(values: InsertEventSchema) {
 
         const event = {
             id: props.id ? props.id : "",

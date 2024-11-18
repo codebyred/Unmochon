@@ -27,7 +27,7 @@ const NavbarTitle = ({className}:{className?:string}) => {
         });
 
     return (
-        <Breadcrumb className={cn("px-4", className)}>
+        <Breadcrumb className={cn("", className)}>
             <BreadcrumbList>{
                 pathSegments.map((path) => (
                     <div key={Math.floor(Math.random() * 1000)} className="flex items-center justify-center">

@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { integer, text, boolean, pgTable, varchar, uuid, timestamp, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
@@ -10,10 +11,6 @@ export const events = pgTable("events",{
     requirements: text("requirements").notNull()
 });
 
-export const Event = createInsertSchema(events);
-
-export type Event = z.infer<typeof Event>
-
 export const actionLogs = pgTable("action_logs", {
     id: serial("id").primaryKey(),
     userId: integer("userId").notNull(),
@@ -24,16 +21,11 @@ export const actionLogs = pgTable("action_logs", {
     additionalInfo: text("additionalInfo"),
 });
 
-export const ActionLog = createInsertSchema(actionLogs);
-
-export type ActionLog = z.infer<typeof ActionLog>
-
 export const teams = pgTable("teams", {
     id:uuid("id").primaryKey().defaultRandom(),
     name:varchar("name").notNull(),  
     eventId: uuid("eventId").references(()=> events.id)
 });
-
 
 export const members = pgTable("members", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -48,7 +40,28 @@ export const teamMembers = pgTable("teamMembers",{
     memberId: uuid("id").references(()=> members.id)
 });
 
+export const MemberSchema = z.object({
+    memberName: z.string(),
+    studentId: z.string().min(8).max(11).regex(/^\d+$/, "Must contain only numbers"),
+    email: z.string().email(),
+})
 
+export const TeamSchema = z.object({
+    teamName: z.string().min(3).max(20),
+    members: z.array(MemberSchema)
+})
+
+export const InsertEventSchema = createInsertSchema(events);
+
+export type InsertEventSchema = z.infer<typeof InsertEventSchema>
+
+export const ActionLog = createInsertSchema(actionLogs);
+
+export type ActionLog = z.infer<typeof ActionLog>
+
+export type MemberSchema = z.infer<typeof MemberSchema>
+
+export type TeamSchema = z.infer<typeof TeamSchema>
   
 
 

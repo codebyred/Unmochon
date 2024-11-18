@@ -1,6 +1,8 @@
+import AddTeamForm from "@/components/AddTeamForm";
+
 const AddTeam = ()=> {
-    return <div>
-        
+    return <div className="p-4">
+        <AddTeamForm/>
     </div>
 }
 

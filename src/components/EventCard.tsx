@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/card"
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { role } from "@/lib/data";
 import DeleteButton from "./DeleteButton";
 import { hasPermission } from "@/lib/auth";
+import { currentUser } from "@clerk/nextjs/server";
 
 type EventItemProps = {
     id: string
@@ -21,7 +21,13 @@ type EventItemProps = {
     path: string,
 }
 
-const EventItem = (props: EventItemProps) => {
+const EventItem = async (props: EventItemProps) => {
+
+    const user = await currentUser();
+
+    if(!user) return (
+        <div></div>
+    )
 
     return (
 
@@ -36,7 +42,7 @@ const EventItem = (props: EventItemProps) => {
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
                 {
-                    hasPermission(role, "delete:events") && <DeleteButton itemId={props.id} />
+                    hasPermission(user, "delete:events") && <DeleteButton itemId={props.id} />
                 }
             </CardFooter>
         </Card>

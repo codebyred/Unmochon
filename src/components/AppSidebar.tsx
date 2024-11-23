@@ -11,44 +11,45 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link";
-import { role } from "@/lib/data";
+import { currentUser } from '@clerk/nextjs/server'
+import { FaHome } from "react-icons/fa";
+import { MdOutlineEmojiEvents } from "react-icons/md";
+import { FaRegClipboard } from "react-icons/fa";
+import { RiTeamFill } from "react-icons/ri";
 
 const sidebarItems = [
     {
-        icon:"",
-        label:"Home",
-        href:"/home",
-        visible:["event-organizer", "faculty", "student"]
+        icon: FaHome,
+        label: "Home",
+        href: "/home",
     },
     {
-        icon:"",
-        label:"Events",
-        href:"/events",
-        visible:["event-organizer", "faculty", "student"]
+        icon: MdOutlineEmojiEvents,
+        label: "Events",
+        href: "/events",
     },
     {
-        icon:"",
-        label:"Announcements",
-        href:"/announcements",
-        visible:["event-organizer"]
-    },
-    {
-        icon:"",
+        icon: FaRegClipboard,
         label: "Evaluation",
-        href:"/evaluation",
-        visible: ["event-organizer", "faculty"]
+        href: "/evaluation",
     },
     {
-        icon:"",
+        icon: RiTeamFill,
         label: "Teams",
-        href:"/teams",
-        visible: ["student", "event-organizer", "faculty"]
+        href: "/teams",
     }
 ]
 
 type SidebarProps = React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const AppSidebar = ({className}:SidebarProps) => {
+const AppSidebar = async ({ className }: SidebarProps) => {
+
+    const user = await currentUser()
+
+    if (!user) return (
+        <div></div>
+    )
+
     return (
         <Sidebar className={cn("flex flex-col", className)}>
             <SidebarHeader className={cn("h-[20%] flex items-center justify-center")}>
@@ -61,20 +62,24 @@ const AppSidebar = ({className}:SidebarProps) => {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu>
-                {
-                    sidebarItems.map((item, index)=>(
-                        item.visible.includes(role) &&
-                        <SidebarMenuItem
-                            className={cn("px-4 py-2")}
-                            key={(index+1) * 1000}
+                    {
+                        sidebarItems.map((item, index) => (
+                            <SidebarMenuItem
+                                className={cn("px-4 py-2")}
+                                key={(index + 1) * 1000}
 
-                        >
-                            <SidebarMenuButton asChild>
-                                <Link href={item.href}>{item.label}</Link>
-                            </SidebarMenuButton>           
-                        </SidebarMenuItem>
-                    ))
-                }
+                            >
+                                <SidebarMenuButton asChild>
+
+                                    <Link href={item.href.toLowerCase()}>
+                                        <item.icon />
+                                        {item.label}
+                                    </Link>
+
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))
+                    }
                 </SidebarMenu>
 
             </SidebarContent>

@@ -1,20 +1,25 @@
 import EventOrganizer from "@/components/EventOrganizer";
 import Faculty from "@/components/Faculty";
 import Student from "@/components/Student";
-import {role} from "@/lib/data"
+import { hasPermission, isEventOrganizer, isStudent } from "@/lib/auth";
+import { currentUser } from "@clerk/nextjs/server";
 
 
 const Dashboard = async () => {
 
+    const user = await currentUser();
+
+    if(!user) return (
+        <div className="flex grow items-center justify-center">Please sign in</div>
+    )
     return (
-        role === "event-organizer"
-        ?
-        <EventOrganizer/>
-        : role === "student"
-        ?
-        <Student/>
-        :
-        <Faculty/>
+        <>
+        {hasPermission(user, "view:eventorganizerdashboard") && <EventOrganizer/>} 
+        
+        {hasPermission(user, "view:studentdashboard") && <Student/>}
+        
+        {hasPermission(user, "view:studentdashboard") && <Faculty/>}
+        </>
     )
 
 }

@@ -1,8 +1,8 @@
 import { getEvent } from "@/actions/events";
+import StudentEventView from "@/components/StudentEventView";
 import UpdateEventForm from "@/components/UpdateEventForm";
-import { Event } from "@/db/schema";
 import { hasPermission } from "@/lib/auth";
-import { role } from "@/lib/data";
+import { currentUser } from "@clerk/nextjs/server";
 
 
 const EventPage = async ({
@@ -14,6 +14,11 @@ const EventPage = async ({
     const id = (await params).id
 
     const [error, result] = await getEvent(id);
+    const user = await currentUser();
+
+    if(!user) return (
+        <div></div>
+    )
 
     return (
         error
@@ -21,7 +26,7 @@ const EventPage = async ({
             <div>No event found</div>
             :
             result && (
-                hasPermission(role, "update:events")
+                hasPermission(user, "update:events")
                 ?
                 <UpdateEventForm
                     id={result[0].id as string}
@@ -31,9 +36,7 @@ const EventPage = async ({
                     requirements={result[0].requirements}
                 />
                 :
-                <div>
-                    student view
-                </div>
+                <StudentEventView eventId={id}/>
             )
 
     )

@@ -21,7 +21,7 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Textarea } from "@/components/ui/textarea"
 import { ImSpinner8 } from "react-icons/im";
-import { createEvent, updateEvent } from "@/actions/events"
+import { createEvent } from "@/actions/events"
 import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"

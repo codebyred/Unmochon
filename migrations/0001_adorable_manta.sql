@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS "emailIdx" ON "students" USING btree ("email");

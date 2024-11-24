@@ -1,11 +1,13 @@
 "use server"
 
 import { db } from "@/db/drizzle";
-import { TeamSchema, teamMembers, teams } from "@/db/schema";
+import { sql, eq } from "drizzle-orm";
+import { TeamSchema, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
 import { teamFormDataToObject } from "@/lib/utils";
+
 
 export async function createTeam(previouState:any, formData: unknown) {
 
@@ -58,5 +60,24 @@ export async function createTeam(previouState:any, formData: unknown) {
 
     revalidatePath('/teams');
     redirect('/teams');
+
+}
+
+export async function getTeam(email: string){
+    const queryOfStudents = await db.select().from(students).where(sql`students.email == ${email}`);
+    if(queryOfStudents.length === 0){
+        return new Error("User is not a student")
+    }
+    const studentId = queryOfStudents.at(0)?.id as string;
+    
+    const queryOfTeamMembers = await db.select().from(teamMembers)
+        .where(sql`teamMembers.memberId == ${studentId}`)
+        .innerJoin(teams, eq(teams.id, teamMembers.teamId))
+
+    if(queryOfTeamMembers.length === 0) {
+        return new Error("Student is not in a team")
+    }
+
+    //return JSON.stringify()
 
 }

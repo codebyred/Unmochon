@@ -1,4 +1,4 @@
-import { integer, text, pgTable, varchar, uuid, timestamp, serial, primaryKey } from "drizzle-orm/pg-core";
+import { integer, text, pgTable, varchar, uuid, timestamp, serial, primaryKey, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -23,13 +23,17 @@ export const actionLogs = pgTable("actionLogs", {
 export const teams = pgTable("teams", {
     id:uuid("id").primaryKey().defaultRandom(),
     name:varchar("name").notNull(),  
-    eventId: uuid("eventId").references(()=> events.id, {onDelete:'cascade'})
+    eventId: uuid("eventId").notNull().references(()=> events.id, {onDelete:'cascade'})
 });
 
 export const students = pgTable("students", {
     id: varchar("id").notNull().primaryKey(), 
     email: varchar("email").notNull(),
     name: varchar("name").notNull(), 
+},(table) =>{
+    return {
+      emailIdx: uniqueIndex("emailIdx").on(table.email)
+    };
 });
 
 export const teamMembers = pgTable("teamMembers",{

@@ -8,6 +8,20 @@
       "when": 1732284679147,
       "tag": "0000_perpetual_george_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1732423680551,
+      "tag": "0001_adorable_manta",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1732434291556,
+      "tag": "0002_old_dagger",
+      "breakpoints": true
     }
   ]
 }

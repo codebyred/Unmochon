@@ -2,14 +2,14 @@
 
 import { db } from "@/db/drizzle";
 import { sql, eq } from "drizzle-orm";
-import { TeamSchema, students, teamMembers, teams } from "@/db/schema";
+import { TeamSchema, events, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
 import { teamFormDataToObject } from "@/lib/utils";
 
 
-export async function createTeam(previouState:any, formData: unknown) {
+export async function createTeam(previouState: any, formData: unknown) {
 
     if (!(formData instanceof FormData)) {
         return new Error("Not formData");
@@ -27,34 +27,33 @@ export async function createTeam(previouState:any, formData: unknown) {
 
     const teamId = v4()
 
-    try{
+    try {
         const resultOfTeamsInsert = await db.insert(teams).values({
             id: teamId,
             name: resultOfParsing.data.teamName,
             eventId: resultOfParsing.data.eventId,
-        }).returning({id: teams.id})
+        }).returning({ id: teams.id })
 
-        if(resultOfTeamsInsert.length === 0) {
+        if (resultOfTeamsInsert.length === 0) {
             throw new Error("Can not create team");
         }
-    }catch(e: unknown) {
-        return (e instanceof Error)? new Error(`${e.message}`): new Error(`${e}`) 
-    } 
+    } catch (e: unknown) {
+        return (e instanceof Error) ? new Error(`${e.message}`) : new Error(`${e}`)
+    }
 
 
-    try{
+    try {
         const resultOfTeamMembersInsert = await db.insert(teamMembers).values(resultOfParsing
-            .data.members.map((member) => 
-                { 
-                    return { teamId: teamId, memberId: member.id } 
-                }
-        )).returning({id: teamMembers.teamId})
-    
-        if(resultOfTeamMembersInsert.length === 0) {
+            .data.members.map((member) => {
+                return { teamId: teamId, memberId: member.id }
+            }
+            )).returning({ id: teamMembers.teamId })
+
+        if (resultOfTeamMembersInsert.length === 0) {
             throw new Error("Can not add team members")
         }
-    }catch(e: unknown){
-        return (e instanceof Error)? new Error(`${e.message}`): new Error(`${e}`) 
+    } catch (e: unknown) {
+        return (e instanceof Error) ? new Error(`${e.message}`) : new Error(`${e}`)
     }
 
 
@@ -63,21 +62,25 @@ export async function createTeam(previouState:any, formData: unknown) {
 
 }
 
-export async function getTeam(email: string){
-    const queryOfStudents = await db.select().from(students).where(sql`students.email == ${email}`);
-    if(queryOfStudents.length === 0){
-        return new Error("User is not a student")
-    }
-    const studentId = queryOfStudents.at(0)?.id as string;
-    
-    const queryOfTeamMembers = await db.select().from(teamMembers)
-        .where(sql`teamMembers.memberId == ${studentId}`)
-        .innerJoin(teams, eq(teams.id, teamMembers.teamId))
+export async function getStudentTeams(email: string) {
 
-    if(queryOfTeamMembers.length === 0) {
-        return new Error("Student is not in a team")
-    }
+    const rows2 = await db
+        .select({
+            teamId: teams.id,
+            teamName: teams.name,
+            eventName: events.eventName,
+            memberEmail: students.email
+        })
+        .from(teams)
+        .innerJoin(teamMembers, eq(teams.id, teamMembers.teamId))
+        .innerJoin(events, eq(teams.eventId, events.id))
+        .innerJoin(students, eq(students.id, teamMembers.memberId));
 
-    //return JSON.stringify()
+    const result = rows2.filter((row, index)=>{
+        return row.memberEmail === email
+    }).map((row, index)=>{
+        return {teamId: row.teamId, teamName: row.teamName, eventName: row.eventName}
+    })
 
+    return result
 }

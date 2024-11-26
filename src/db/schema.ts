@@ -47,7 +47,7 @@ export const InsertStudentSchema = createInsertSchema(students,{
 })
 
 export const TeamSchema = z.object({
-    eventId: z.string().uuid().optional(),
+    eventId: z.string().uuid(),
     teamName: z.string().min(3).max(20),
     members: z.array(InsertStudentSchema)
 })

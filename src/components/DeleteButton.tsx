@@ -14,6 +14,7 @@ import {
 
 type DeleteButtonProps = {
     itemId: string
+    serverAction: (id: string) => Promise<void>
 }
 
 const DeleteButton = (props: DeleteButtonProps) => {
@@ -37,7 +38,7 @@ const DeleteButton = (props: DeleteButtonProps) => {
                 <div className="flex items-center flex-end gap-4">
                     <Button
                         variant={"destructive"}
-                        onClick={async () => await deleteEvent(props.itemId)}
+                        onClick={async () => await props.serverAction(props.itemId)}
                     >
                         yes
                     </Button>

@@ -1,3 +1,5 @@
+"use client"
+
 import {
     Table,
     TableBody,
@@ -8,6 +10,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { Button } from "./ui/button"
+import { deleteTeam } from "@/actions/teams"
+import DeleteButton from "./DeleteButton"
 
 
 type Data = {
@@ -34,6 +39,12 @@ export const TeamTable = (props: TeamTableProps)=>{
                     <TableRow key={item.teamId}>
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
+                        <TableCell>
+                            <DeleteButton
+                                itemId={item.teamId}
+                                serverAction={deleteTeam}
+                            />
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>

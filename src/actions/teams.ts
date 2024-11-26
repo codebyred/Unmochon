@@ -84,3 +84,16 @@ export async function getStudentTeams(email: string) {
 
     return result
 }
+
+export async function deleteTeam(teamId: string){
+    const result = await db.delete(teams).where(eq(teams.id, teamId)).returning({id: teams.id})
+
+    if (result.length === 0) {
+        const error = encodeURIComponent("Could not delete Team");
+        redirect(`/teams?error=${error}`);
+      }
+    
+      const success = encodeURIComponent("Team deleted successfully");
+      revalidatePath('/events');
+      redirect(`/teams?success=${success}`);
+}

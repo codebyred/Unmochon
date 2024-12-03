@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { SignIn } from '@clerk/nextjs'
-import Link from 'next/link'
-import { FaArrowRightLong } from "react-icons/fa6";
+import { redirect } from 'next/navigation';
+
 
 export default async function Home() {
   const { userId } = await auth()
@@ -12,8 +12,5 @@ export default async function Home() {
     </div>
   }
 
-  return <div className='flex flex-col items-center justify-center h-screen'>
-      <h1 className='text-xl font-medium'>Welcome!</h1>
-      <Link href="/home" className='text-blue-400 font-normal flex items-center'>Go back to dashboard<FaArrowRightLong /> </Link>
-    </div>
+  redirect("/home");
 }

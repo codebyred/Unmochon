@@ -48,7 +48,7 @@ const AddEventForm = () => {
     useEffect(()=>{
         if(error)
             toast({description: error.toString(), variant:"destructive"})
-    }, [error]);
+    }, [error, toast]);
 
 
     async function onSubmit(values: InsertEventSchema) {
@@ -83,7 +83,7 @@ const AddEventForm = () => {
                             variant={'destructive'}
                             type="button"
                             disabled={isPending}
-                            onClick={(e) => router.back()}
+                            onClick={() => router.back()}
                         >
                             Cancel
                         </Button>

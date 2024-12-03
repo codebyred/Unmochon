@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db/drizzle";
-import { sql, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { TeamSchema, events, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
@@ -9,15 +9,13 @@ import { redirect } from "next/navigation";
 import { teamFormDataToObject } from "@/lib/utils";
 
 
-export async function createTeam(previouState: any, formData: unknown) {
+export async function createTeam(previouState: unknown, formData: unknown) {
 
     if (!(formData instanceof FormData)) {
         return new Error("Not formData");
     }
 
     const formDataObject = teamFormDataToObject(formData);
-
-    console.log(formDataObject)
 
     const resultOfParsing = TeamSchema.safeParse(formDataObject);
 
@@ -64,7 +62,7 @@ export async function createTeam(previouState: any, formData: unknown) {
 
 export async function getStudentTeams(email: string) {
 
-    const rows2 = await db
+    const rows = await db
         .select({
             teamId: teams.id,
             teamName: teams.name,
@@ -76,9 +74,9 @@ export async function getStudentTeams(email: string) {
         .innerJoin(events, eq(teams.eventId, events.id))
         .innerJoin(students, eq(students.id, teamMembers.memberId));
 
-    const result = rows2.filter((row, index)=>{
+    const result = rows.filter((row)=>{
         return row.memberEmail === email
-    }).map((row, index)=>{
+    }).map((row)=>{
         return {teamId: row.teamId, teamName: row.teamName, eventName: row.eventName}
     })
 
@@ -96,4 +94,23 @@ export async function deleteTeam(teamId: string){
       const success = encodeURIComponent("Team deleted successfully");
       revalidatePath('/events');
       redirect(`/teams?success=${success}`);
+}
+
+
+export async function getTeamInfo(teamId: string) {
+    const rows =  await db
+        .select({
+            teamName: teams.name,
+            eventName: events.eventName,
+            memberName: students.name,
+            memberEmail: students.email,
+            memberId: students.id
+        })
+        .from(teamMembers)
+        .innerJoin(teams, eq(teams.id, teamMembers.teamId))
+        .innerJoin(events, eq(events.id, teams.eventId))
+        .innerJoin(students, eq(teamMembers.memberId, students.id))
+        .where(eq(teamMembers.teamId, teamId));
+
+    return rows
 }

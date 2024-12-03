@@ -4,7 +4,6 @@ import { InsertEventSchema } from "@/db/schema";
 import AddItemCard from "@/components/AddItemCard";
 import EventCard from "@/components/EventCard";
 import { hasPermission } from "@/lib/auth";
-import { Toaster } from "@/components/ui/toaster";
 import FooterToaster from "@/components/FooterToaster";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -28,7 +27,7 @@ const Events = async () => {
             <>
             <div className="px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {
-                    events.map((item, index) => (
+                    events.map((item) => (
                         <EventCard
                             key={ Math.floor(Math.random() * 9231)}
                             id={item.id as string}

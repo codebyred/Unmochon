@@ -1,5 +1,5 @@
 import StudentTeamView from "@/components/StudentTeamView";
-import { hasPermission, isEventOrganizer, isStudent } from "@/lib/auth";
+import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 
 

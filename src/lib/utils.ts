@@ -1,4 +1,3 @@
-import { TeamSchema } from "@/db/schema";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 

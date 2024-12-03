@@ -2,8 +2,6 @@ import { cn } from "@/lib/utils";
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
     SidebarMenuButton,
     SidebarHeader,
     SidebarMenu,

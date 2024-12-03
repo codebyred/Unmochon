@@ -8,7 +8,7 @@ import { db } from "@/db/drizzle";
 import { events } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-export async function createEvent(previousState: any, formData: FormData) {
+export async function createEvent(previousState: unknown, formData: FormData) {
 
   const result = InsertEventSchema.safeParse({
       eventName: formData.get('eventName'), 
@@ -39,7 +39,7 @@ export async function createEvent(previousState: any, formData: FormData) {
 
 }
 
-export async function updateEvent(previousState: any, formData: FormData) {
+export async function updateEvent(previousState: unknown, formData: FormData) {
 
   const result = InsertEventSchema.safeParse({
     id: formData.get('id'),
@@ -76,16 +76,18 @@ export async function getEvents() {
 
 export async function getEvent(eventId: string):Promise<[Error | null, InsertEventSchema[] | null]>  {
 
-  let error: Error | null = null;
-  let result: InsertEventSchema[] | null = null;
+  try {
+    const result = await db.select().from(events).where(sql`${events.id} = ${eventId}`);
 
-  result = await db.select().from(events).where(sql`${events.id} = ${eventId}`)
+    if (result.length === 0) {
+      return [new Error("Event not found"), null];
+    }
 
-  if (result.length === 0) {
-    error = new Error("no event found");
+    return [null, result];
+  } catch (error) {
+    console.error(`Failed to fetch event with ID ${eventId}:`, error);
+    return [new Error("An error occurred while fetching the event"), null];
   }
-
-  return [error,result]
   
 }
 

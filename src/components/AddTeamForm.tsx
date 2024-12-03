@@ -25,12 +25,16 @@ import { createTeam } from "@/actions/teams"
 import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
 import { Toaster } from "./ui/toaster"
+import { ImSpinner8 } from "react-icons/im"
+import { useRouter } from "next/navigation"
 
 type AddTeamFormProps = {
     events: InsertEventSchema[]
 }
 
 const AddTeamForm = (props: AddTeamFormProps) => {
+
+    const router = useRouter()
 
     const form = useForm<TeamSchema>({
         resolver: zodResolver(TeamSchema),
@@ -51,8 +55,6 @@ const AddTeamForm = (props: AddTeamFormProps) => {
     }, [error]);
 
     async function onSubmit(values: TeamSchema) {
-
-        console.log(values);
 
         const formData = new FormData()
 
@@ -84,8 +86,8 @@ const AddTeamForm = (props: AddTeamFormProps) => {
                             className="ml-2.5"
                             variant={'destructive'}
                             type="button"
-                        //disabled={isPending}
-                        //onClick={(e) => router.back()}
+                            disabled={isPending}
+                            onClick={() => router.back()}
                         >
                             Cancel
                         </Button>
@@ -93,11 +95,10 @@ const AddTeamForm = (props: AddTeamFormProps) => {
                         <Button
                             className="mr-2.5"
                             type="submit"
-                            //disabled={isPending}
+                            disabled={isPending}
                             data-cy="addEvent-btn"
                         >
-                            {/* {isPending ? <ImSpinner8 /> : "Add"} */}
-                            Save
+                            {isPending ? <ImSpinner8 /> : "Save"}  
                         </Button>
 
                     </div>
@@ -116,7 +117,7 @@ const AddTeamForm = (props: AddTeamFormProps) => {
                                         </FormControl>
                                         <SelectContent>
                                             {
-                                                props.events.map((event, index) => (
+                                                props.events.map((event) => (
                                                     <SelectItem key={event.id} value={event.id as string}>{event.eventName}</SelectItem>
                                                 ))
                                             }

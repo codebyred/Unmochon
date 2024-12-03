@@ -16,18 +16,19 @@ const EventPage = async ({
     const [error, result] = await getEvent(id);
     const user = await currentUser();
 
-    if(!user) return (
+    if (!user) return (
         <div></div>
     )
 
+    if (error || result === null) return (
+        <div>No event found</div>
+    )
+
     return (
-        error
-            ?
-            <div>No event found</div>
-            :
-            result && (
+        <>
+            {
                 hasPermission(user, "update:events")
-                ?
+                &&
                 <UpdateEventForm
                     id={result[0].id as string}
                     eventName={result[0].eventName}
@@ -35,9 +36,13 @@ const EventPage = async ({
                     lastDateOfRegistration={result[0].lastDateOfRegistration}
                     requirements={result[0].requirements}
                 />
-                :
-                <StudentEventView eventId={id}/>
-            )
+            }
+            {
+                hasPermission(user, "register:events")
+                &&
+                <StudentEventView eventId={id} />
+            }
+        </>
 
     )
 }

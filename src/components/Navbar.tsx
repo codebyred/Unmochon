@@ -1,16 +1,16 @@
-import {
-    Menubar,
-    MenubarContent,
-    MenubarItem,
-    MenubarMenu,
-    MenubarSeparator,
-    MenubarShortcut,
-    MenubarTrigger,
-} from "@/components/ui/menubar"
+// import {
+//     Menubar,
+//     MenubarContent,
+//     MenubarItem,
+//     MenubarMenu,
+//     MenubarSeparator,
+//     MenubarShortcut,
+//     MenubarTrigger,
+// } from "@/components/ui/menubar"
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+//import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import NavbarTitle from "./NavbarTitle";
-import { SignOutButton, UserButton } from '@clerk/nextjs'
+import { UserButton } from '@clerk/nextjs'
 
 
 const Navbar = ({className}:{className?:string}) => {

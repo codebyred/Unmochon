@@ -11,6 +11,7 @@ import { Button } from "./ui/button";
 import DeleteButton from "./DeleteButton";
 import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
+import { deleteEvent } from "@/actions/events";
 
 type EventItemProps = {
     id: string
@@ -42,7 +43,10 @@ const EventItem = async (props: EventItemProps) => {
             <CardFooter className="flex items-center flex-end gap-4">
                 <Button asChild><Link href={props.path}>view</Link></Button>
                 {
-                    hasPermission(user, "delete:events") && <DeleteButton itemId={props.id} />
+                    hasPermission(user, "delete:events") && <DeleteButton 
+                    itemId={props.id} 
+                    serverAction={deleteEvent}
+                    />
                 }
             </CardFooter>
         </Card>

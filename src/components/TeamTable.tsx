@@ -1,9 +1,6 @@
-"use client"
-
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableFooter,
     TableHead,
@@ -13,11 +10,12 @@ import {
 import { Button } from "./ui/button"
 import { deleteTeam } from "@/actions/teams"
 import DeleteButton from "./DeleteButton"
+import Link from "next/link"
 
 
 type Data = {
     teamId: string
-    teamName:string
+    teamName: string
     eventName: string
 }
 
@@ -25,12 +23,12 @@ type TeamTableProps = {
     data: Data[]
 }
 
-export const TeamTable = (props: TeamTableProps)=>{
+export const TeamTable = (props: TeamTableProps) => {
     return (
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>TeamName</TableHead>
+                    <TableHead>Team Name</TableHead>
                     <TableHead>Event Name</TableHead>
                 </TableRow>
             </TableHeader>
@@ -40,10 +38,17 @@ export const TeamTable = (props: TeamTableProps)=>{
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
                         <TableCell>
-                            <DeleteButton
-                                itemId={item.teamId}
-                                serverAction={deleteTeam}
-                            />
+                            <div className="flex flex-row-reverse gap-2">
+                                <DeleteButton
+                                    itemId={item.teamId}
+                                    serverAction={deleteTeam}
+                                />
+                                <Button asChild>
+                                    <Link href={`/teams/${item.teamId}`}>
+                                        View
+                                    </Link>
+                                </Button>
+                            </div>
                         </TableCell>
                     </TableRow>
                 ))}

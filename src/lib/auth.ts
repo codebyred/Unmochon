@@ -11,9 +11,8 @@ export type Permission =
   | "evaluate:team"
   | "register:events"
   | "create:team"
-  | "view:studentdashboard"
-  | "view:eventorganizerdashboard"
-  | "view:facultydashboard"
+  | "view:evaluationboard"
+
 
 
 type UserPermissions = {
@@ -27,7 +26,7 @@ const userPermissions: UserPermissions = {
     "delete:events",
     "update:events",
     "view:allteams",
-    "view:eventorganizerdashboard"
+    "view:evaluationboard"
   ],
   faculty:[
     "view:events",
@@ -35,7 +34,6 @@ const userPermissions: UserPermissions = {
     "evaluate:team"
   ],
   student:[
-    "view:studentdashboard",
     "view:events",
     "register:events",
     "view:ownteams",

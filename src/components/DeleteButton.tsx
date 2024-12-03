@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "./ui/button";
-import { deleteEvent } from "@/actions/events";
 import {
     Dialog,
     DialogClose,

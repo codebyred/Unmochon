@@ -21,7 +21,7 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Textarea } from "@/components/ui/textarea"
 import { ImSpinner8 } from "react-icons/im";
-import { createEvent, updateEvent } from "@/actions/events"
+import { updateEvent } from "@/actions/events"
 import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -60,7 +60,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
     useEffect(()=>{
         if(error)
             toast({description: error.toString(), variant:"destructive"})
-    }, [error]);
+    }, [error, toast]);
 
 
     async function onSubmit(values: InsertEventSchema) {
@@ -96,7 +96,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                             variant={'destructive'}
                             type="button"
                             disabled={isPending}
-                            onClick={(e) => router.back()}
+                            onClick={() => router.back()}
                         >
                             Cancel
                         </Button>                      

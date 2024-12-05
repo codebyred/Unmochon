@@ -7,10 +7,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { deleteTeam } from "@/actions/teams"
-import DeleteButton from "./DeleteButton"
+import DeleteButton from "@/components/DeleteButton"
 import Link from "next/link"
+import { currentUser } from "@clerk/nextjs/server"
+import { hasPermission } from "@/lib/auth"
 
 
 type Data = {
@@ -23,7 +25,21 @@ type TeamTableProps = {
     data: Data[]
 }
 
-export const TeamTable = (props: TeamTableProps) => {
+export const TeamTable = async (props: TeamTableProps) => {
+
+    const user = await currentUser();
+
+    if (!user) return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Team Name</TableHead>
+                    <TableHead>Event Name</TableHead>
+                </TableRow>
+            </TableHeader>
+        </Table>
+    )
+
     return (
         <Table>
             <TableHeader>
@@ -39,10 +55,13 @@ export const TeamTable = (props: TeamTableProps) => {
                         <TableCell>{item.eventName}</TableCell>
                         <TableCell>
                             <div className="flex flex-row-reverse gap-2">
-                                <DeleteButton
-                                    itemId={item.teamId}
-                                    serverAction={deleteTeam}
-                                />
+                                {
+                                    hasPermission(user, "delete:team")
+                                    &&
+                                    <DeleteButton
+                                        itemId={item.teamId}
+                                        serverAction={deleteTeam}
+                                    />}
                                 <Button asChild>
                                     <Link href={`/teams/${item.teamId}`}>
                                         View

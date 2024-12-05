@@ -1,50 +1,40 @@
 import { getEvent } from "@/actions/events";
-import StudentEventView from "@/components/StudentEventView";
-import UpdateEventForm from "@/components/UpdateEventForm";
-import { hasPermission } from "@/lib/auth";
-import { currentUser } from "@clerk/nextjs/server";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 
-const EventPage = async ({
+const StudentEventView = async ({
     params,
 }: {
     params: Promise<{ id: string }>
-}) => {
+})=>{
 
-    const id = (await params).id
+    const eventId = (await params).id
 
-    const [error, result] = await getEvent(id);
-    const user = await currentUser();
+    const [error, result] = await getEvent(eventId);
 
-    if (!user) return (
-        <div></div>
+    if(error!== null || result === null) return (
+        <div>No data found related to event</div>
     )
-
-    if (error || result === null) return (
-        <div>No event found</div>
-    )
-
+    
     return (
-        <>
-            {
-                hasPermission(user, "update:events")
-                &&
-                <UpdateEventForm
-                    id={result[0].id as string}
-                    eventName={result[0].eventName}
-                    lastDateOfProjectSubmission={result[0].lastDateOfProjectSubmission}
-                    lastDateOfRegistration={result[0].lastDateOfRegistration}
-                    requirements={result[0].requirements}
-                />
-            }
-            {
-                hasPermission(user, "register:events")
-                &&
-                <StudentEventView eventId={id} />
-            }
-        </>
-
+        <div className="shadow-custom p-2 rounded-lg">
+            <h1 className="text-4xl">
+                {result.at(0)?.eventName}
+            </h1>
+            <h2 className="text-2xl font-thin">
+                Requirements
+            </h2>
+            <p>
+                {result.at(0)?.requirements}
+            </p>
+            <Button>
+                <Link href={`/teams/register?eventName=${encodeURIComponent(result.at(0)?.eventName as string)}&eventId=${result.at(0)?.id}`}>
+                    Register
+                </Link>
+            </Button>
+        </div>
     )
 }
 
-export default EventPage;
+export default StudentEventView;

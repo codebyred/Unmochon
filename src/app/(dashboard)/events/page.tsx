@@ -1,10 +1,9 @@
 import Add from "@/components/Add";
 import { getEvents } from "@/actions/events";
 import { InsertEventSchema } from "@/db/schema";
-import AddItemCard from "@/components/AddItemCard";
-import EventCard from "@/components/EventCard";
+import AddItemCard from "@/components/card/AddItemCard";
+import EventCard from "@/components/card/EventCard";
 import { hasPermission } from "@/lib/auth";
-import FooterToaster from "@/components/FooterToaster";
 import { currentUser } from "@clerk/nextjs/server";
 
 const Events = async () => {
@@ -21,7 +20,7 @@ const Events = async () => {
         (events.length === 0 && hasPermission(user, "add:events"))
             ?
             <div className="flex items-center justify-center grow">
-                <Add path="/events/add" />
+                <Add path="/events/add"/>
             </div>
             :
             <>
@@ -34,7 +33,13 @@ const Events = async () => {
                             title={item.eventName}
                             lastDateOfProjectSubmission={item.lastDateOfProjectSubmission}
                             lastDateOfRegistration={item.lastDateOfRegistration}
-                            path={`/events/${item.id? item.id: ""}`}
+                            path={
+                                hasPermission(user, "update:events")
+                                ?
+                                `/events/update/${item.id as string}`
+                                :
+                                `/events/${item.id as string}`
+                            }
                         />
                     ))
                 }
@@ -42,7 +47,6 @@ const Events = async () => {
                 {hasPermission(user, "add:events") && <AddItemCard href="/events/add"/>}
                     
             </div>
-            <FooterToaster/>
             </>
 
     );

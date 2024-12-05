@@ -1,7 +1,7 @@
 import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { Calendar } from "@/components/ui/calendar"
-import DashboardCard from "@/components/DashboardCard";
+import DashboardCard from "@/components/card/DashboardCard";
 import Analytics from "@/components/Analytics";
 import { getEvents } from "@/actions/events";
 import { getStudentTeams } from "@/actions/teams";

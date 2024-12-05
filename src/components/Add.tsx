@@ -16,7 +16,7 @@ const Add = (props: AddProps)=> {
 
     return (
         <div 
-            onClick={() => handleClick}
+            onClick={() => handleClick()}
         >
             <IoMdAddCircleOutline className="w-20 h-20"/>
         </div>

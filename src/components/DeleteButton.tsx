@@ -1,5 +1,6 @@
 "use client"
 
+import { startTransition, useActionState } from "react";
 import { Button } from "./ui/button";
 import {
     Dialog,
@@ -10,13 +11,23 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { toast } from "@/hooks/use-toast";
 
 type DeleteButtonProps = {
     itemId: string
-    serverAction: (id: string) => Promise<void>
+    serverAction: (previousState:unknown,id: string) => Promise<void>
 }
 
 const DeleteButton = (props: DeleteButtonProps) => {
+
+    const [error, formAction, isPending] = useActionState(props.serverAction, null);
+
+    function handleClick() {
+        startTransition(()=> {
+            formAction(props.itemId);
+            toast({description: "Event deleted successfully"})
+        })
+    }
 
     return (
         <Dialog>
@@ -37,7 +48,7 @@ const DeleteButton = (props: DeleteButtonProps) => {
                 <div className="flex items-center flex-end gap-4">
                     <Button
                         variant={"destructive"}
-                        onClick={async () => await props.serverAction(props.itemId)}
+                        onClick={async () => handleClick()}
                     >
                         yes
                     </Button>

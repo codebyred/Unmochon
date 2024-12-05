@@ -60,6 +60,31 @@ export async function createTeam(previouState: unknown, formData: unknown) {
 
 }
 
+type Result = {teamId: string, teamName: string, eventName: string}
+export async function getAllTeams():Promise<[Error | null, Result[] | null]> {
+
+    try{
+        const rows = await db
+        .select({
+            teamId: teams.id,
+            teamName: teams.name,
+            eventName: events.eventName,
+        })
+        .from(teams)
+        .innerJoin(events, eq(events.id, teams.eventId));
+
+        if(rows.length === 0) {
+            return [new Error("No teams available"), null]
+        }
+
+        return [null, rows]
+
+    }catch(error) {
+        return [new Error("An error occured while fetching teams"), null]
+    }
+
+}
+
 export async function getStudentTeams(email: string) {
 
     const rows = await db

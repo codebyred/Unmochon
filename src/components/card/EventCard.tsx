@@ -7,8 +7,8 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import Link from "next/link";
-import { Button } from "./ui/button";
-import DeleteButton from "./DeleteButton";
+import { Button } from "../ui/button";
+import DeleteButton from "../DeleteButton";
 import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { deleteEvent } from "@/actions/events";

@@ -7,16 +7,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from "@/db/drizzle";
 import { events } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { cookies } from "next/headers";
 
-export async function createEvent(previousState: unknown, formData: FormData) {
+export async function createEvent(previousState: unknown, values: string) {
 
-  const result = InsertEventSchema.safeParse({
-      eventName: formData.get('eventName'), 
-      lastDateOfRegistration: new Date(formData.get('lastDateOfRegistration') as string), 
-      lastDateOfProjectSubmission: new Date(formData.get('lastDateOfProjectSubmission') as string), 
-      requirements: formData.get('requirements')
-    });
-    
+  const valuesObj = JSON.parse(values);
+
+  if(Object.hasOwn(valuesObj, "lastDateOfRegistration")) {
+    valuesObj.lastDateOfRegistration = new Date(valuesObj.lastDateOfRegistration)
+  }
+
+  if(Object.hasOwn(valuesObj, "lastDateOfProjectSubmission")) {
+    valuesObj.lastDateOfProjectSubmission = new Date(valuesObj.lastDateOfProjectSubmission)
+  }
+
+  const result = InsertEventSchema.safeParse(valuesObj); 
 
   if (!result.success) {
     return new Error(result.error.issues[0].message);
@@ -77,21 +82,22 @@ export async function getEvents() {
 export async function getEvent(eventId: string):Promise<[Error | null, InsertEventSchema[] | null]>  {
 
   try {
-    const result = await db.select().from(events).where(sql`${events.id} = ${eventId}`);
 
-    if (result.length === 0) {
+    const row = await db.select().from(events).where(eq(events.id, eventId));
+
+    if (row.length === 0) {
       return [new Error("Event not found"), null];
     }
 
-    return [null, result];
+    return [null, row];
+
   } catch (error) {
-    console.error(`Failed to fetch event with ID ${eventId}:`, error);
     return [new Error("An error occurred while fetching the event"), null];
   }
   
 }
 
-export async function deleteEvent(eventId: string){
+export async function deleteEvent(previoudState:unknown, eventId: string){
 
 
   const result = await db.delete(events).where(sql`${events.id} = ${eventId}`).returning()
@@ -101,9 +107,16 @@ export async function deleteEvent(eventId: string){
     redirect(`/events?error=${error}`);
   }
 
-  const success = encodeURIComponent("Event deleted successfully");
   revalidatePath('/events');
-  redirect(`/events?success=${success}`);
+  redirect(`/events`);
 
 }
+
+export async function isRegisteredToEvent(formData: FormData) {
+
+  // const eventId = formData.get('eventId');
+  // const studentId = formData.get('studentId')
+  // const row = await db.query.teams.fi
+}
+
 

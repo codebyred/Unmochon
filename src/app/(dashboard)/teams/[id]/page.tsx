@@ -1,5 +1,6 @@
 import { getTeamInfo } from "@/actions/teams";
-import MemberTable from "@/components/MemberTable";
+import MemberTable from "@/components/table/MemberTable";
+import { Separator } from "@/components/ui/separator"
 
 const TeamView = async ({
     params,
@@ -14,7 +15,10 @@ const TeamView = async ({
     return (
         <div className="flex flex-col p-4">
             <div className="flex flex-col grow">
-                <div className="flex gap-12 mb-4 shadow-custom rounded p-2">
+
+            </div>
+            <div className="shadow-custom p-2 rounded">
+                <div className="flex gap-12 mb-4">
                     <h1 className="text-2xl font-bold ">
                         Team Name
                         <p className="font-normal">{teamInfo.at(0)?.teamName}</p>
@@ -24,10 +28,7 @@ const TeamView = async ({
                         <p className="font-normal">{teamInfo.at(0)?.eventName}</p>
                     </h1>
                 </div>
-
-
-            </div>
-            <div className="shadow-custom p-2 rounded">
+                <Separator className="mb-4"/>
                 <h1 className="text-2xl font-bold">
                     Members
                 </h1>

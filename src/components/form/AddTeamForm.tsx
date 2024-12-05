@@ -20,26 +20,26 @@ import {
 import { InsertEventSchema, TeamSchema } from "@/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useFieldArray } from "react-hook-form"
-import { Input } from "./ui/input"
+import { Input } from "../ui/input"
 import { createTeam } from "@/actions/teams"
 import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
-import { Toaster } from "./ui/toaster"
+import { Toaster } from "../ui/toaster"
 import { ImSpinner8 } from "react-icons/im"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
-type AddTeamFormProps = {
-    events: InsertEventSchema[]
-}
 
-const AddTeamForm = (props: AddTeamFormProps) => {
+const AddTeamForm = () => {
 
     const router = useRouter()
+    const searchParams = useSearchParams();
+    const eventId = searchParams.get('eventId');
+    const eventName = searchParams.get('eventName');
 
     const form = useForm<TeamSchema>({
         resolver: zodResolver(TeamSchema),
         defaultValues: {
-            eventId: "",
+            eventId: eventId as string,
             teamName: "",
             members: [{ name: '', id: '', email: '' }]
         }
@@ -52,9 +52,11 @@ const AddTeamForm = (props: AddTeamFormProps) => {
     useEffect(() => {
         if (error)
             toast({ description: error.toString(), variant: "destructive" })
-    }, [error]);
+    }, [error, toast]);
 
     async function onSubmit(values: TeamSchema) {
+
+        console.log(values)
 
         const formData = new FormData()
 
@@ -77,9 +79,11 @@ const AddTeamForm = (props: AddTeamFormProps) => {
     }
 
     return (
-        <>
-            <Form {...form}>
-                <form className="" onSubmit={form.handleSubmit(onSubmit)}>
+
+        <Form {...form}>
+            <form className="" onSubmit={form.handleSubmit(onSubmit)}>
+
+                <div className="flex flex-col gap-2 shadow-custom rounded-lg mt-2 mb-2 p-2">
                     <div className="flex flex-row-reverse">
 
                         <Button
@@ -98,57 +102,30 @@ const AddTeamForm = (props: AddTeamFormProps) => {
                             disabled={isPending}
                             data-cy="addEvent-btn"
                         >
-                            {isPending ? <ImSpinner8 /> : "Save"}  
+                            {isPending ? <ImSpinner8 /> : "Save"}
                         </Button>
 
                     </div>
-                    <div className="flex gap-2 shadow-custom rounded-lg mt-2 mb-2 p-2">
-                        <FormField
-                            control={form.control}
-                            name="eventId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Select Event</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select an event" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {
-                                                props.events.map((event) => (
-                                                    <SelectItem key={event.id} value={event.id as string}>{event.eventName}</SelectItem>
-                                                ))
-                                            }
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="teamName"
-                            render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>Team Name</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormDescription>
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
+                    <FormField
+                        control={form.control}
+                        name="teamName"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormLabel>Team Name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
 
                     {
                         fields.map((field, index) => (
-                            <div key={field.id} className="flex flex-col gap-2 shadow-custom rounded-lg mt-2 mb-2 p-2">
+                            <div key={field.id} className="">
                                 <div className="flex gap-2">
                                     <FormField
                                         control={form.control}
@@ -207,14 +184,15 @@ const AddTeamForm = (props: AddTeamFormProps) => {
 
                         ))
                     }
-                    <div className="flex items-center justify-center">
-                        <Button type="button" onClick={() => append({ name: '', id: '', email: '' })}>Add member</Button>
-                    </div>
+                </div>
+                <div className="flex items-center justify-center">
+                    <Button type="button" onClick={() => append({ name: '', id: '', email: '' })}>Add member</Button>
+                </div>
 
-                </form>
-            </Form>
-            <Toaster />
-        </>
+            </form>
+        </Form>
+
+
     )
 
 }

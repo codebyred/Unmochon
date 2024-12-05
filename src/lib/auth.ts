@@ -12,6 +12,7 @@ export type Permission =
   | "register:events"
   | "create:team"
   | "view:evaluationboard"
+  | "delete:team"
 
 
 
@@ -37,7 +38,8 @@ const userPermissions: UserPermissions = {
     "view:events",
     "register:events",
     "view:ownteams",
-    "create:team"
+    "create:team",
+    "delete:team"
   ],
   other:[]
 }

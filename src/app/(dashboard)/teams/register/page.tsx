@@ -1,5 +1,5 @@
 import { getEvents } from "@/actions/events";
-import AddTeamForm from "@/components/AddTeamForm";
+import AddTeamForm from "@/components/form/AddTeamForm";
 import { InsertEventSchema } from "@/db/schema";
 
 const AddTeam = async () => {
@@ -11,7 +11,6 @@ const AddTeam = async () => {
             ?
             <div className="p-4">
                 <AddTeamForm 
-                    events={events}
                 />
             </div>
             :

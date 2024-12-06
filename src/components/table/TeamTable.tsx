@@ -60,6 +60,7 @@ export const TeamTable = async (props: TeamTableProps) => {
                                     &&
                                     <DeleteButton
                                         itemId={item.teamId}
+                                        itemName="Team"
                                         serverAction={deleteTeam}
                                     />}
                                 <Button asChild>

@@ -5,6 +5,7 @@ import DashboardCard from "@/components/card/DashboardCard";
 import Analytics from "@/components/Analytics";
 import { getEvents } from "@/actions/events";
 import { getStudentTeams } from "@/actions/teams";
+import { v4 } from "uuid";
 
 const Dashboard = async () => {
 
@@ -64,8 +65,8 @@ const Dashboard = async () => {
                     className="rounded-md border"
                 />
                 {
-                    events.map((event, index) => (
-                        <div className="shadow-custom rounded-lg p-4" key={Math.floor(Math.random() * (index + 1))}>
+                    events.map((event) => (
+                        <div className="shadow-custom rounded-lg p-4" key={v4()}>
                             <h1 className="text-sm font-bold">{event.eventName}</h1>
                             <p className="text-sm">last date of registration: {event.lastDateOfRegistration.toDateString()}</p>
                         </div>

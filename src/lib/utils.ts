@@ -244,6 +244,18 @@ export function display12HourValue(hours: number) {
   if (hours % 12 > 9) return `${hours}`;
   return `0${hours % 12}`;
 }
+
+export function isPastLastDateOfEventRegistration(lastDateOfRegistration: Date): boolean {
+
+  console.log(lastDateOfRegistration)
+
+  const currentDate = new Date(2024, 11, 13)
+
+  if(currentDate > lastDateOfRegistration){
+    return true;
+  }
+  return false;
+}
  
 
 

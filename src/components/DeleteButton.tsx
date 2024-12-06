@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 
 type DeleteButtonProps = {
     itemId: string
+    itemName: string
     serverAction: (previousState:unknown,id: string) => Promise<void>
 }
 
@@ -25,7 +26,7 @@ const DeleteButton = (props: DeleteButtonProps) => {
     function handleClick() {
         startTransition(()=> {
             formAction(props.itemId);
-            toast({description: "Event deleted successfully"})
+            toast({description: `${props.itemName} deleted successfully`})
         })
     }
 

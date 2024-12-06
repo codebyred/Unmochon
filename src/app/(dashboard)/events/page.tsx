@@ -5,6 +5,7 @@ import AddItemCard from "@/components/card/AddItemCard";
 import EventCard from "@/components/card/EventCard";
 import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
+import { v4 } from "uuid";
 
 const Events = async () => {
 
@@ -28,7 +29,7 @@ const Events = async () => {
                 {
                     events.map((item) => (
                         <EventCard
-                            key={ Math.floor(Math.random() * 9231)}
+                            key={ v4() }
                             id={item.id as string}
                             title={item.eventName}
                             lastDateOfProjectSubmission={item.lastDateOfProjectSubmission}
@@ -38,7 +39,7 @@ const Events = async () => {
                                 ?
                                 `/events/update/${item.id as string}`
                                 :
-                                `/events/${item.id as string}`
+                                `/events/register/${item.id as string}`
                             }
                         />
                     ))

@@ -12,6 +12,7 @@ import DeleteButton from "../DeleteButton";
 import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { deleteEvent } from "@/actions/events";
+import { isPastLastDateOfEventRegistration } from "@/lib/utils";
 
 type EventItemProps = {
     id: string
@@ -38,14 +39,40 @@ const EventItem = async (props: EventItemProps) => {
                 <CardDescription>{props.description}</CardDescription>
             </CardHeader>
             <CardContent className="text-red-500">
-                {props.lastDateOfRegistration && `last day to register: ${props.lastDateOfProjectSubmission.toDateString()}`}
+                {
+                    props.lastDateOfRegistration
+                    && 
+                    `last day to register: ${
+                        props
+                        .lastDateOfProjectSubmission
+                        .toLocaleString('en-GB',{
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                        })
+                    }`
+                }
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
-                <Button asChild><Link href={props.path}>view</Link></Button>
                 {
-                    hasPermission(user, "delete:events") && <DeleteButton 
-                    itemId={props.id} 
-                    serverAction={deleteEvent}
+                    isPastLastDateOfEventRegistration(props.lastDateOfRegistration)
+                    ?
+                    `Event registration is closed`
+                    :
+                    <Button asChild>
+                        <Link href={props.path}>view</Link>
+                    </Button>
+                }
+                {
+                    hasPermission(user, "delete:events") 
+                    && 
+                    <DeleteButton 
+                        itemId={props.id} 
+                        itemName="Event"
+                        serverAction={deleteEvent}
                     />
                 }
             </CardFooter>

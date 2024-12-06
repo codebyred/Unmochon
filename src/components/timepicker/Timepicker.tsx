@@ -6,12 +6,12 @@ import { TimePickerInput } from "./TimepickerInput";
 import { TimePeriodSelect } from "./PeriodSelect";
 import { Period } from "@/lib/utils";
  
-interface TimePickerDemoProps {
+interface TimePickerProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
 }
  
-export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
+export function TimePicker({ date, setDate }: TimePickerProps) {
   const [period, setPeriod] = React.useState<Period>("PM");
  
   const minuteRef = React.useRef<HTMLInputElement>(null);

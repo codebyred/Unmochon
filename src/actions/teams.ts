@@ -108,7 +108,8 @@ export async function getStudentTeams(email: string) {
     return result
 }
 
-export async function deleteTeam(teamId: string){
+export async function deleteTeam(previousState:unknown, teamId: string){
+    
     const result = await db.delete(teams).where(eq(teams.id, teamId)).returning({id: teams.id})
 
     if (result.length === 0) {
@@ -116,9 +117,8 @@ export async function deleteTeam(teamId: string){
         redirect(`/teams?error=${error}`);
       }
     
-      const success = encodeURIComponent("Team deleted successfully");
-      revalidatePath('/events');
-      redirect(`/teams?success=${success}`);
+    revalidatePath('/teams');
+    redirect(`/teams`);
 }
 
 

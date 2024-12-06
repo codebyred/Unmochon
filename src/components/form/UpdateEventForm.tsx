@@ -24,9 +24,8 @@ import { ImSpinner8 } from "react-icons/im";
 import { updateEvent } from "@/actions/events"
 import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { TimePicker } from "@/components/timepicker/Timepicker"
 import { useToast } from "@/hooks/use-toast"
-import { Toaster } from "@/components/ui/toaster"
-
 
 type UpdateEventFormProps = {
     id: string
@@ -79,18 +78,17 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
             formData.append(key, value);
         }
 
-        startTransition(async () =>
+        startTransition(async () =>{
             await formAction(formData)
-        );
+            toast({description: "Event updated successfully"})
+        });
 
     }
 
     return (
-
         <Form {...form}>
-            <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex flex-row-reverse">
-
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex flex-row-reverse mb-4">
                     <Button
                         className="ml-2.5"
                         variant={'destructive'}
@@ -100,7 +98,6 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                     >
                         Cancel
                     </Button>
-
                     <Button
                         className="mr-2.5"
                         type="submit"
@@ -109,26 +106,24 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                     >
                         {isPending ? <ImSpinner8 /> : "Update"}
                     </Button>
-
                 </div>
-
-                <FormField
-                    control={form.control}
-                    name="eventName"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col grow">
-                            <FormLabel>Event name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} data-cy="eventName" />
-                            </FormControl>
-                            <FormDescription>
-
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
                 <div className="flex flex-col md:flex-row md:items-center md:justify between gap-4">
+                    <FormField
+                        control={form.control}
+                        name="eventName"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel>Event name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} data-cy="eventName" />
+                                </FormControl>
+                                <FormDescription>
+
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name="lastDateOfRegistration"
@@ -155,16 +150,24 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) =>
-                                                date < new Date()
-                                            }
-                                            initialFocus
-                                        />
+                                    <PopoverContent className="w-auto p-0 h-[380px] overflow-y-auto" align="start">
+                                        <div>
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                disabled={(date) =>
+                                                    date < new Date()
+                                                }
+                                                initialFocus
+                                            />
+                                            <div className="p-4 border-t border-border">
+                                                <TimePicker
+                                                    date={field.value}
+                                                    setDate={field.onChange}
+                                                />
+                                            </div>
+                                        </div>
                                     </PopoverContent>
                                 </Popover>
                                 <FormDescription>
@@ -199,16 +202,24 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) =>
-                                                date < new Date()
-                                            }
-                                            initialFocus
-                                        />
+                                    <PopoverContent className="w-auto p-0 h-[380px] overflow-y-auto" align="start">
+                                        <div>
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                disabled={(date) =>
+                                                    date < new Date()
+                                                }
+                                                initialFocus
+                                            />
+                                            <div className="p-4 border-t border-border">
+                                                <TimePicker
+                                                    date={field.value}
+                                                    setDate={field.onChange}
+                                                />
+                                            </div>
+                                        </div>
                                     </PopoverContent>
                                 </Popover>
                                 <FormDescription>
@@ -227,7 +238,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                             <FormControl>
                                 <Textarea
                                     placeholder=""
-                                    className="resize-none"
+                                    className="resize-none min-h-[300px]"
                                     {...field}
                                     data-cy="requirements"
                                 />
@@ -240,6 +251,8 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                 />
             </form>
         </Form>
+
+
     );
 }
 

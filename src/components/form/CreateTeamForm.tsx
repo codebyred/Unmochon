@@ -2,13 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
     Form,
     FormControl,
     FormDescription,
@@ -17,19 +10,18 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { InsertEventSchema, TeamSchema } from "@/db/schema"
+import { TeamSchema } from "@/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useFieldArray } from "react-hook-form"
 import { Input } from "../ui/input"
 import { createTeam } from "@/actions/teams"
 import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
-import { Toaster } from "../ui/toaster"
 import { ImSpinner8 } from "react-icons/im"
 import { useRouter, useSearchParams } from "next/navigation"
 
 
-const AddTeamForm = () => {
+const CreateTeamForm = () => {
 
     const router = useRouter()
     const searchParams = useSearchParams();
@@ -56,8 +48,6 @@ const AddTeamForm = () => {
 
     async function onSubmit(values: TeamSchema) {
 
-        console.log(values)
-
         const formData = new FormData()
 
         formData.append("teamName", values.teamName);
@@ -72,9 +62,10 @@ const AddTeamForm = () => {
             formData.append(`members[${index}][email]`, member.email);
         });
 
-        startTransition(async () =>
+        startTransition(async () =>{
             await formAction(formData)
-        );
+            toast({description: "Team registration completed"})
+        });
 
     }
 
@@ -197,4 +188,4 @@ const AddTeamForm = () => {
 
 }
 
-export default AddTeamForm
+export default CreateTeamForm

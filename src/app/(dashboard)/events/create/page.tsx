@@ -1,9 +1,9 @@
-import AddEventForm from "@/components/form/AddEventForm"
+import CreateEventForm from "@/components/form/CreateEventForm"
 
 const AddEvent = () => {
 
     return <div className="px-4 grow" data-cy="addEvent-page">
-        <AddEventForm/>
+        <CreateEventForm/>
     </div>
 
 }

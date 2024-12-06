@@ -4,7 +4,7 @@ import TeamTable from "@/components/table/TeamTable";
 import { hasPermission } from "@/lib/auth";
 
 
-const StudentTeamView = async ()=>{
+const Teams = async ()=>{
 
     const user = await currentUser();
 
@@ -64,4 +64,4 @@ const StudentTeamView = async ()=>{
    
 }
 
-export default StudentTeamView;
+export default Teams;

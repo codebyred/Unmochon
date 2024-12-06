@@ -13,6 +13,8 @@ import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { deleteEvent } from "@/actions/events";
 import { isPastLastDateOfEventRegistration } from "@/lib/utils";
+import { format } from "date-fns";
+import { AiOutlineExclamationCircle } from "react-icons/ai";
 
 type EventItemProps = {
     id: string
@@ -33,35 +35,27 @@ const EventItem = async (props: EventItemProps) => {
 
     return (
 
-        <Card className="flex flex-col justify-between">
+        <Card className="flex flex-col justify-between min-w-[340px] min-h-[300px]">
             <CardHeader>
                 <CardTitle>{props.title}</CardTitle>
                 <CardDescription>{props.description}</CardDescription>
             </CardHeader>
-            <CardContent className="text-red-500">
-                {
-                    props.lastDateOfRegistration
+            <CardContent className="flex">
+                {   isPastLastDateOfEventRegistration(props.lastDateOfRegistration)
                     && 
-                    `last day to register: ${
-                        props
-                        .lastDateOfProjectSubmission
-                        .toLocaleString('en-GB',{
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                        })
-                    }`
+                    props.lastDateOfRegistration
+                    ?
+                    <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle/>Event registration is closed</p>
+                    :
+                    <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle/>last day to register: {format(props.lastDateOfRegistration, "PPP hh:mm aa")}</p>
                 }
             </CardContent>
             <CardFooter className="flex items-center flex-end gap-4">
                 {
-                    isPastLastDateOfEventRegistration(props.lastDateOfRegistration)
-                    ?
-                    `Event registration is closed`
-                    :
+                    hasPermission(user, "view:events") 
+                    &&
+                    (hasPermission(user, "update:events") || !isPastLastDateOfEventRegistration(props.lastDateOfRegistration))
+                    && 
                     <Button asChild>
                         <Link href={props.path}>view</Link>
                     </Button>

@@ -44,15 +44,19 @@ export async function createEvent(previousState: unknown, values: string) {
 
 }
 
-export async function updateEvent(previousState: unknown, formData: FormData) {
+export async function updateEvent(previousState: unknown, values: string) {
 
-  const result = InsertEventSchema.safeParse({
-    id: formData.get('id'),
-    eventName: formData.get('eventName'), 
-    lastDateOfRegistration: new Date(formData.get('lastDateOfRegistration') as string), 
-    lastDateOfProjectSubmission: new Date(formData.get('lastDateOfProjectSubmission') as string), 
-    requirements: formData.get('requirements')
-  });
+  const valuesObj = JSON.parse(values);
+
+  if(Object.hasOwn(valuesObj, "lastDateOfRegistration")) {
+    valuesObj.lastDateOfRegistration = new Date(valuesObj.lastDateOfRegistration)
+  }
+
+  if(Object.hasOwn(valuesObj, "lastDateOfProjectSubmission")) {
+    valuesObj.lastDateOfProjectSubmission = new Date(valuesObj.lastDateOfProjectSubmission)
+  }
+
+  const result = InsertEventSchema.safeParse(valuesObj); 
   
 
   if (!result.success) {
@@ -112,12 +116,6 @@ export async function deleteEvent(previoudState:unknown, eventId: string){
 
 }
 
-export async function isRegisteredToEvent(formData: FormData) {
-
-  // const eventId = formData.get('eventId');
-  // const studentId = formData.get('studentId')
-  // const row = await db.query.teams.fi
-}
 
 
 

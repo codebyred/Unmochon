@@ -6,18 +6,14 @@ import { TeamSchema, events, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
-import { teamFormDataToObject } from "@/lib/utils";
 
 
-export async function createTeam(previouState: unknown, formData: unknown) {
+export async function createTeam(previouState: unknown, values: string) {
 
-    if (!(formData instanceof FormData)) {
-        return new Error("Not formData");
-    }
 
-    const formDataObject = teamFormDataToObject(formData);
+    const valuesObj = JSON.parse(values);
 
-    const resultOfParsing = TeamSchema.safeParse(formDataObject);
+    const resultOfParsing = TeamSchema.safeParse(valuesObj);
 
     if (!resultOfParsing.success) {
         return new Error("Invalid Form Data")

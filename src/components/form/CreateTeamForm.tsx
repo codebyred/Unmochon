@@ -48,23 +48,15 @@ const CreateTeamForm = () => {
 
     async function onSubmit(values: TeamSchema) {
 
-        const formData = new FormData()
-
-        formData.append("teamName", values.teamName);
-        if (values.eventId) {
-            formData.append("eventId", values.eventId);
-        }
-
-        // Append array fields
-        values.members.forEach((member, index) => {
-            formData.append(`members[${index}][id]`, member.id);
-            formData.append(`members[${index}][name]`, member.name);
-            formData.append(`members[${index}][email]`, member.email);
-        });
 
         startTransition(async () =>{
-            await formAction(formData)
-            toast({description: "Team registration completed"})
+            try{
+                await formAction(JSON.stringify(values))
+                toast({description: "Team registration completed"})
+            }catch(err){
+                toast({description: "Could not register", variant:"destructive"})
+            }
+
         });
 
     }
@@ -93,7 +85,11 @@ const CreateTeamForm = () => {
                             disabled={isPending}
                             data-cy="addEvent-btn"
                         >
-                            {isPending ? <ImSpinner8 /> : "Save"}
+                        {
+                            isPending 
+                            ? <div className="flex items-center justify-center"><ImSpinner8/>Creating...</div>
+                            : "Create"
+                        }
                         </Button>
 
                     </div>

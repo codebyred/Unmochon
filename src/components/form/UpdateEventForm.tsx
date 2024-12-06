@@ -64,23 +64,14 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
 
     async function onSubmit(values: InsertEventSchema) {
 
-        const event = {
-            id: props.id ? props.id : "",
-            lastDateOfRegistration: values.lastDateOfRegistration.toISOString().split('T')[0],
-            lastDateOfProjectSubmission: values.lastDateOfProjectSubmission.toISOString().split('T')[0],
-            eventName: values.eventName,
-            requirements: values.requirements
-        }
-
-        const formData = new FormData();
-
-        for (const [key, value] of Object.entries(event)) {
-            formData.append(key, value);
-        }
-
         startTransition(async () =>{
-            await formAction(formData)
-            toast({description: "Event updated successfully"})
+            try{
+                await formAction(JSON.stringify(values))
+                toast({description: "Event updated successfully"})
+            }catch(err){
+                toast({description: "Could not update event", variant:"destructive"})
+            }
+
         });
 
     }
@@ -104,7 +95,11 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                         disabled={isPending}
                         data-cy="updateEvent-btn"
                     >
-                        {isPending ? <ImSpinner8 /> : "Update"}
+                        {
+                            isPending 
+                            ? <div className="flex items-center justify-center"><ImSpinner8/>Updating...</div>
+                            : "Update"
+                        }
                     </Button>
                 </div>
                 <div className="flex flex-col md:flex-row md:items-center md:justify between gap-4">
@@ -136,13 +131,13 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    "w-[320px] pl-3 text-left font-normal",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 data-cy="registration-date-btn"
                                             >
                                                 {field.value ? (
-                                                    format(field.value, "PPP")
+                                                    format(field.value, "PPP hh:mm:ss aa")
                                                 ) : (
                                                     <span>Pick a date</span>
                                                 )}
@@ -188,13 +183,13 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    "w-[320px] pl-3 text-left font-normal",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 data-cy="projectSubmission-date-btn"
                                             >
                                                 {field.value ? (
-                                                    format(field.value, "PPP")
+                                                    format(field.value, "PPP hh:mm:ss aa")
                                                 ) : (
                                                     <span>Pick a date</span>
                                                 )}

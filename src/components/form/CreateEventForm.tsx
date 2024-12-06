@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { format } from "date-fns"
+import { addDays, format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -55,8 +55,13 @@ const AddEventForm = () => {
     async function onSubmit(values: InsertEventSchema) {
 
         startTransition(async () => {
-            await formAction(JSON.stringify(values));
-            toast({ description: "Event created successfully" })
+            try{
+                await formAction(JSON.stringify(values));
+                toast({ description: "Event created successfully" })
+            }catch(err){
+                toast({description:"Could not create event", variant:"destructive"})
+            }
+
         });
 
     }
@@ -81,7 +86,11 @@ const AddEventForm = () => {
                         disabled={isPending}
                         data-cy="addEvent-btn"
                     >
-                        {isPending ? <ImSpinner8 /> : "Add"}
+                        {
+                            isPending 
+                            ? <div className="flex items-center justify-center"><ImSpinner8 /> Creating...</div>
+                            : "Create"
+                        }
                     </Button>
 
                 </div>
@@ -107,20 +116,20 @@ const AddEventForm = () => {
                         name="lastDateOfRegistration"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                                <FormLabel>Last date for registration</FormLabel>
+                                <FormLabel>Last date of registration</FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    "w-[320px] pl-3 text-left font-normal",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 data-cy="registration-date-btn"
                                             >
                                                 {field.value ? (
-                                                    format(field.value, "PPP")
+                                                    format(field.value, "PPP hh:mm:ss aa")
                                                 ) : (
                                                     <span>Pick a date</span>
                                                 )}
@@ -166,13 +175,13 @@ const AddEventForm = () => {
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    "w-[320px] pl-3 text-left font-normal",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 data-cy="projectSubmission-date-btn"
                                             >
                                                 {field.value ? (
-                                                    format(field.value, "PPP")
+                                                    format(field.value, "PPP hh:mm:ss aa")
                                                 ) : (
                                                     <span>Pick a date</span>
                                                 )}

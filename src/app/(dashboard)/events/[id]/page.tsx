@@ -30,27 +30,6 @@ const StudentEventView = async ({
             <p>
                 {result.at(0)?.requirements}
             </p>
-            {
-                isPastLastDateOfEventRegistration(result.at(0)?.lastDateOfRegistration!)
-                    ?
-                    <div>
-                        <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle/>Event registration is closed</p>
-                        <Button>
-                            Submit Project
-                        </Button>
-                    </div>
-
-                    :
-                    <Button>
-                        <Link
-                            href={
-                                `/teams/create?eventName=${encodeURIComponent(result.at(0)?.eventName as string)}&eventId=${result.at(0)?.id}`
-                            }
-                        >
-                            Register
-                        </Link>
-                    </Button>
-            }
         </div>
     )
 }

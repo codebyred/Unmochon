@@ -2,7 +2,7 @@ import CreateEventForm from "@/components/form/CreateEventForm"
 
 const AddEvent = () => {
 
-    return <div className="px-4 grow" data-cy="addEvent-page">
+    return <div className="p-4 grow shadow-custom rounded-lg" data-cy="addEvent-page">
         <CreateEventForm/>
     </div>
 

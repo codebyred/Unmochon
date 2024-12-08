@@ -14,7 +14,7 @@ export default function DashboardLayout({
               <AppSidebar/>
               <div className="grow flex flex-col">
                 <Navbar/>
-                <main className="mt-4 mb-4 grow">
+                <main className="p-4 grow flex flex-col">
                   {children}
                   <Toaster/>
                 </main>

@@ -4,6 +4,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 type DashboardCardProps = {
     topic: string
@@ -12,12 +13,13 @@ type DashboardCardProps = {
 
 const DashboardCard = (props: DashboardCardProps) => {
     return (
-        <Card className="w-44 h-40 flex flex-col justify-between">
+        <Card className="w-44 h-44 flex flex-col justify-between">
             <CardHeader>
                 <CardTitle>{props.topic}</CardTitle>
-            </CardHeader>
+            </CardHeader>         
             <CardContent>
-                <p className="font-bold">{props.amount}</p>
+                <Separator/>
+                <p className="font-bold text-2xl text-center">{props.amount}</p>
             </CardContent>
         </Card>
 

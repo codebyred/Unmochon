@@ -1,5 +1,14 @@
 "use client"
 
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { format } from "date-fns"
@@ -21,22 +30,21 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Textarea } from "@/components/ui/textarea"
 import { ImSpinner8 } from "react-icons/im";
-import { updateEvent } from "@/actions/events"
+import { deleteEvent, updateEvent } from "@/actions/events"
 import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { TimePicker } from "@/components/timepicker/Timepicker"
-import { useToast } from "@/hooks/use-toast"
+import { toast, useToast } from "@/hooks/use-toast"
+import DeleteButton from "../DeleteButton"
+import { MagicBackButton } from "@/components/MagicBackButton"
 
 type UpdateEventFormProps = {
-    id: string
-    eventName: string
-    lastDateOfRegistration: Date
-    lastDateOfProjectSubmission: Date
-    requirements: string
+    event: InsertEventSchema
 }
 
 const UpdateEventForm = (props: UpdateEventFormProps) => {
 
+    const { event } = props;
     const router = useRouter();
     const { toast } = useToast();
 
@@ -44,11 +52,11 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
         resolver: zodResolver(InsertEventSchema),
         defaultValues:
         {
-            id: props.id.length >= 0 ? props.id : "",
-            eventName: props.eventName ? props.eventName : "",
-            lastDateOfRegistration: props.lastDateOfRegistration ? props.lastDateOfRegistration : new Date(),
-            lastDateOfProjectSubmission: props.lastDateOfProjectSubmission ? props.lastDateOfProjectSubmission : new Date(),
-            requirements: props.requirements ? props.requirements : ""
+            id: event.id,
+            eventName: event.eventName,
+            lastDateOfRegistration: event.lastDateOfRegistration,
+            lastDateOfProjectSubmission: event.lastDateOfProjectSubmission,
+            requirements: event.requirements
         }
 
     });
@@ -64,12 +72,12 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
 
     async function onSubmit(values: InsertEventSchema) {
 
-        startTransition(async () =>{
-            try{
+        startTransition(async () => {
+            try {
                 await formAction(JSON.stringify(values))
-                toast({description: "Event updated successfully"})
-            }catch(err){
-                toast({description: "Could not update event", variant:"destructive"})
+                toast({ description: "Event updated successfully" })
+            } catch (err) {
+                toast({ description: "Could not update event", variant: "destructive" })
             }
 
         });
@@ -79,28 +87,27 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex flex-row-reverse mb-4">
-                    <Button
-                        className="ml-2.5"
-                        variant={'destructive'}
-                        type="button"
-                        disabled={isPending}
-                        onClick={() => router.back()}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        className="mr-2.5"
-                        type="submit"
-                        disabled={isPending}
-                        data-cy="updateEvent-btn"
-                    >
-                        {
-                            isPending 
-                            ? <div className="flex items-center justify-center"><ImSpinner8/>Updating...</div>
-                            : "Update"
-                        }
-                    </Button>
+                <div className="flex justify-between mb-4">
+                    <MagicBackButton type="button"/>
+                    <div className="gap-4">
+                        <Button
+                            className="mr-2.5"
+                            type="submit"
+                            disabled={isPending}
+                            data-cy="updateEvent-btn"
+                        >
+                            {
+                                isPending
+                                    ? <div className="flex items-center justify-center"><ImSpinner8 />Updating...</div>
+                                    : "Update"
+                            }
+                        </Button>
+                        <DeleteButton
+                            itemId={event.id as string}
+                            itemName={event.eventName}
+                            serverAction={deleteEvent}
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-col md:flex-row md:items-center md:justify between gap-4">
                     <FormField
@@ -247,6 +254,57 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
             </form>
         </Form>
 
+
+    );
+}
+
+type DeleteButtonProps = {
+    itemId: string
+    itemName: string
+}
+
+const DeleteEventButton = (props: DeleteButtonProps) => {
+
+    const [error, formAction, isPending] = useActionState(deleteEvent, null);
+
+    function handleClick() {
+        startTransition(() => {
+            formAction(props.itemId);
+            toast({ description: `${props.itemName} deleted successfully` })
+        })
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button
+                    variant={"destructive"}
+                >
+                    delete
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                        This action cannot be undone. This will permanently delete this item.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center flex-end gap-4">
+                    <Button
+                        variant={"destructive"}
+                        onClick={async () => handleClick()}
+                    >
+                        yes
+                    </Button>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                            Close
+                        </Button>
+                    </DialogClose>
+                </div>
+            </DialogContent>
+        </Dialog>
 
     );
 }

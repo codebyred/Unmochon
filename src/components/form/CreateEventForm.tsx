@@ -26,6 +26,7 @@ import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { TimePicker } from "@/components/timepicker/Timepicker"
+import { MagicBackButton } from "@/components/MagicBackButton"
 
 
 
@@ -69,19 +70,9 @@ const AddEventForm = () => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex flex-row-reverse mb-4">
+                <div className="flex justify-between mb-4">
+                    <MagicBackButton type="button"/>
                     <Button
-                        className="ml-2.5"
-                        variant={'destructive'}
-                        type="button"
-                        disabled={isPending}
-                        onClick={() => router.back()}
-                    >
-                        Cancel
-                    </Button>
-
-                    <Button
-                        className="mr-2.5"
                         type="submit"
                         disabled={isPending}
                         data-cy="addEvent-btn"

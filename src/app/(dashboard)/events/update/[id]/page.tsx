@@ -23,14 +23,10 @@ const EventPage = async ({
     )
 
     return (
-        <div className="px-4" data-cy="addEvent-page">
+        <div className="grow p-4 shadow-custom rounded-lg" data-cy="addEvent-page">
 
             <UpdateEventForm
-                id={result[0].id as string}
-                eventName={result[0].eventName}
-                lastDateOfProjectSubmission={result[0].lastDateOfProjectSubmission}
-                lastDateOfRegistration={result[0].lastDateOfRegistration}
-                requirements={result[0].requirements}
+                event={result[0]}
             />
         
         </div>

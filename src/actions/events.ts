@@ -77,10 +77,15 @@ export async function updateEvent(previousState: unknown, values: string) {
   redirect('/events');
 }
 
-export async function getEvents() {
-  const events: InsertEventSchema[] = await db.query.events.findMany();
+export async function getEvents():Promise<[Error | null, InsertEventSchema[] | null]> {
 
-  return events;
+  try{
+    const events: InsertEventSchema[] = await db.query.events.findMany();
+    return [null, events];
+  }catch(err) {
+    return [new Error("Could not fetch events"), null]
+  }
+
 }
 
 export async function getEvent(eventId: string):Promise<[Error | null, InsertEventSchema[] | null]>  {
@@ -112,7 +117,7 @@ export async function deleteEvent(previoudState:unknown, eventId: string){
   }
 
   revalidatePath('/events');
-  redirect(`/events`);
+  redirect('/events');
 
 }
 

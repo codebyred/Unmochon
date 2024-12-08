@@ -9,11 +9,15 @@ import { v4 } from "uuid";
 
 const Events = async () => {
 
-    const events: InsertEventSchema[] = await getEvents();
+    const [error, events]  = await getEvents();
     const user = await currentUser()
 
     if (!user) return (
         <div>Please sign in</div>
+    )
+
+    if(error || events === null) return (
+        <div>An error occured or no events found</div>
     )
 
     if (events.length === 0 && hasPermission(user, "add:events")) return (
@@ -23,24 +27,15 @@ const Events = async () => {
     )
 
     return (
-        <div className="px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grow p-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 shadow-custom rounded-lg">
             {
-                events.map((item) => (
-                    <EventCard
+                events.map((event) => {
+
+                    return <EventCard
                         key={v4()}
-                        id={item.id as string}
-                        title={item.eventName}
-                        lastDateOfProjectSubmission={item.lastDateOfProjectSubmission}
-                        lastDateOfRegistration={item.lastDateOfRegistration}
-                        path={
-                            hasPermission(user, "update:events")
-                                ?
-                                `/events/update/${item.id as string}`
-                                :
-                                `/events/register/${item.id as string}`
-                        }
+                        event={event}
                     />
-                ))
+                })
                 
             }
             {hasPermission(user, "add:events") && <AddItemCard href="/events/create" />}

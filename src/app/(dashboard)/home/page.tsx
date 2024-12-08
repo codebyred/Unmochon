@@ -2,7 +2,7 @@ import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { Calendar } from "@/components/ui/calendar"
 import DashboardCard from "@/components/card/DashboardCard";
-import Analytics from "@/components/Analytics";
+import Analytics from "@/components/chart/Analytics";
 import { getEvents } from "@/actions/events";
 import { getStudentTeams } from "@/actions/teams";
 import { v4 } from "uuid";
@@ -10,10 +10,14 @@ import { v4 } from "uuid";
 const Dashboard = async () => {
 
     const user = await currentUser();
-    const events = await getEvents();
+    const [error,events] = await getEvents();
 
     if (!user) return (
         <div className="flex grow items-center justify-center">Please sign in</div>
+    )
+
+    if(error || events === null) return (
+        <div>An error occured or could not get events</div>
     )
 
     let myteams: number = 0;
@@ -45,7 +49,7 @@ const Dashboard = async () => {
                     }
 
                     <DashboardCard
-                        topic="Teams"
+                        topic="Total Teams"
                         amount="0"
                     />
                     <DashboardCard
@@ -54,7 +58,7 @@ const Dashboard = async () => {
                     />
                 </div>
                 <div>
-                    <Analytics />
+                    <Analytics className="mt-4 mb-4"/>
                 </div>
             </div>
 

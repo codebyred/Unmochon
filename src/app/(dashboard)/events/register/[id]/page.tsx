@@ -1,9 +1,12 @@
 import { getEvent } from "@/actions/events";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { isPastLastDateOfEventRegistration } from "@/lib/utils";
+import { format } from "date-fns";
 import Link from "next/link";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-
+import { FaCalendarTimes } from "react-icons/fa";
+import { FaTools } from "react-icons/fa";
 
 const StudentEventView = async ({
     params,
@@ -20,37 +23,39 @@ const StudentEventView = async ({
     )
 
     return (
-        <div className="shadow-custom p-2 rounded-lg">
-            <h1 className="text-4xl">
-                {result.at(0)?.eventName}
-            </h1>
-            <h2 className="text-2xl font-thin">
+        <div className="shadow-custom p-4 rounded-lg grow">
+            <div className="flex justify-between">
+                <h1 className="text-4xl">
+                    {result.at(0)?.eventName}
+                </h1>
+                <Button asChild>
+                    <Link href={{
+                        pathname:"/teams/create",
+                        query:{
+                            eventName:result[0].eventName,
+                            eventId:result[0].id
+                        }
+                    }}>
+                        Registration
+                    </Link>
+                </Button>
+            </div>
+            <Separator className="mt-4 mb-4"/>
+            <div>
+                <h2 className="flex items-center gap-2 text-xl font-thin">
+                    <FaCalendarTimes/>Deadlines
+                </h2>
+                <p className="text-red-600">Registration deadline: {format(result[0].lastDateOfRegistration, "PPP hh:mm aa")}</p>
+                <p className="text-red-600">Project submission deadline: {format(result[0].lastDateOfProjectSubmission, "PPP hh:mm aa")}</p>
+            </div>
+            <Separator className="mt-4 mb-4"/>
+            <h2 className="text-xl font-thin flex items-center gap-2">
+                <FaTools />
                 Requirements
             </h2>
             <p>
                 {result.at(0)?.requirements}
             </p>
-            {
-                isPastLastDateOfEventRegistration(result.at(0)?.lastDateOfRegistration!)
-                    ?
-                    <div>
-                        <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle/>Event registration is closed</p>
-                        <Button>
-                            Submit Project
-                        </Button>
-                    </div>
-
-                    :
-                    <Button>
-                        <Link
-                            href={
-                                `/teams/create?eventName=${encodeURIComponent(result.at(0)?.eventName as string)}&eventId=${result.at(0)?.id}`
-                            }
-                        >
-                            Register
-                        </Link>
-                    </Button>
-            }
         </div>
     )
 }

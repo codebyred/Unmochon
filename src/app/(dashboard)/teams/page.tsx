@@ -37,7 +37,7 @@ const Teams = async ()=>{
         )
 
         return (
-            <div className="flex flex-col">
+            <div className="p-4 grow shadow-custom rounded-lg">
                 <TeamTable data={result}/>
             </div>
         )
@@ -55,7 +55,7 @@ const Teams = async ()=>{
         )
     
         return (
-            <div className="flex flex-col">
+            <div className="p-4 grow shadow-custom rounded-lg">
                 <TeamTable data={result}/>
             </div>
         )

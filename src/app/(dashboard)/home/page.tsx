@@ -29,7 +29,7 @@ const Dashboard = async () => {
 
     return (
 
-        <div className="flex p-4 grow justify-between">
+        <div className="flex p-4 grow">
             {/*LEFT */}
             <div className="flex flex-col grow mr-4">
                 <div className="flex justify-between">

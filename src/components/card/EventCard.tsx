@@ -16,7 +16,8 @@ import { AiOutlineExclamationCircle } from "react-icons/ai";
 
 import { InsertEventSchema } from "@/db/schema";
 import { CiMenuKebab } from "react-icons/ci";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@/components/ui/separator";
+
 
 type EventItemProps = {
     event: InsertEventSchema,
@@ -32,23 +33,30 @@ const EventItem = async (props: EventItemProps) => {
     )
 
     return (
-        <Card className="flex flex-col justify-between min-w-[340px] min-h-[300px] max-h-[360px]">
+        <Card className="flex flex-col justify-between w-[340px] h-[360px]">
             <CardHeader>
-                <CardTitle>{event.eventName}</CardTitle>
+                <CardTitle className="overflow-hidden h-[100px]">{event.eventName}</CardTitle>
+                <Separator/>
             </CardHeader>
-            <CardContent className="flex">
+            <CardContent className="flex h-[160px] overflow-y-hidden">
                 {isPastLastDateOfEventRegistration(event.lastDateOfRegistration)
                     &&
                     event.lastDateOfRegistration
                     ?
-                    <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle />Event registration is closed</p>
+                    <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Event registration is closed</p>
                     :
-                    <p className="text-red-500 flex items-center gap-2"><AiOutlineExclamationCircle />last day to register: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}</p>
+                    <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Registration deadline: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}</p>
                 }         
             </CardContent>
             <CardFooter className="flex flex-col items-center justify-center">
-                <Button>
-                    <Link href={`/events/update/${event.id}`}>view</Link>
+                <Button asChild>
+                    <Link href={
+                        hasPermission(user, "update:events")?`/events/update/${event.id}`
+                        :hasPermission(user,"register:events")?`/events/register/${event.id}`
+                        :`/events/${event.id}`
+                    }>
+                        view
+                    </Link>
                 </Button>
             </CardFooter>
         </Card>

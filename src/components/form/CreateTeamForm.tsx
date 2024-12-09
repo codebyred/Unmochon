@@ -19,7 +19,9 @@ import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
 import { ImSpinner8 } from "react-icons/im"
 import { useRouter, useSearchParams } from "next/navigation"
-
+import { MagicBackButton } from "../MagicBackButton"
+import { FaPlus } from "react-icons/fa6";
+import { ImCross } from "react-icons/im";
 
 const CreateTeamForm = () => {
 
@@ -65,22 +67,10 @@ const CreateTeamForm = () => {
 
         <Form {...form}>
             <form className="" onSubmit={form.handleSubmit(onSubmit)}>
-
-                <div className="flex flex-col gap-2 shadow-custom rounded-lg mt-2 mb-2 p-2">
-                    <div className="flex flex-row-reverse">
-
+                <div className="mb-4">
+                    <div className="flex justify-between items- mb-4">
+                        <MagicBackButton type="button"/>
                         <Button
-                            className="ml-2.5"
-                            variant={'destructive'}
-                            type="button"
-                            disabled={isPending}
-                            onClick={() => router.back()}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            className="mr-2.5"
                             type="submit"
                             disabled={isPending}
                             data-cy="addEvent-btn"
@@ -88,10 +78,9 @@ const CreateTeamForm = () => {
                         {
                             isPending 
                             ? <div className="flex items-center justify-center"><ImSpinner8/>Creating...</div>
-                            : "Create"
+                            : "Submit"
                         }
                         </Button>
-
                     </div>
                     <FormField
                         control={form.control}
@@ -163,7 +152,14 @@ const CreateTeamForm = () => {
                                 <div className="flex items-center justify-center">
                                     {
                                         index > 0 && (
-                                            <Button type="button" variant={"destructive"} onClick={() => remove(index)}>Remove member</Button>
+                                            <Button 
+                                                className="w-12 h-12 rounded-full"
+                                                type="button" 
+                                                variant={"destructive"} 
+                                                onClick={() => remove(index)}
+                                            >
+                                                    <ImCross/>
+                                            </Button>
                                         )
                                     }
                                 </div>
@@ -173,9 +169,13 @@ const CreateTeamForm = () => {
                     }
                 </div>
                 <div className="flex items-center justify-center">
-                    <Button type="button" onClick={() => append({ name: '', id: '', email: '' })}>Add member</Button>
+                    <Button 
+                        className="rounded-full w-12 h-12"
+                        type="button" 
+                        onClick={() => append({ name: '', id: '', email: '' })}>
+                        <FaPlus/>
+                    </Button>
                 </div>
-
             </form>
         </Form>
 

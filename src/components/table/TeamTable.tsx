@@ -41,11 +41,12 @@ export const TeamTable = async (props: TeamTableProps) => {
     )
 
     return (
-        <Table>
+        <Table className="overflow-hidden">
             <TableHeader>
                 <TableRow>
                     <TableHead>Team Name</TableHead>
                     <TableHead>Event Name</TableHead>
+                    <TableHead>Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -54,7 +55,12 @@ export const TeamTable = async (props: TeamTableProps) => {
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
                         <TableCell>
-                            <div className="flex flex-row-reverse gap-2">
+                            <div className="flex gap-2">
+                                <Button asChild>
+                                    <Link href={`/teams/${item.teamId}`}>
+                                        View
+                                    </Link>
+                                </Button>
                                 {
                                     hasPermission(user, "delete:team")
                                     &&
@@ -63,11 +69,6 @@ export const TeamTable = async (props: TeamTableProps) => {
                                         itemName="Team"
                                         serverAction={deleteTeam}
                                     />}
-                                <Button asChild>
-                                    <Link href={`/teams/${item.teamId}`}>
-                                        View
-                                    </Link>
-                                </Button>
                             </div>
                         </TableCell>
                     </TableRow>

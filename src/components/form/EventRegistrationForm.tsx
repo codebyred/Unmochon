@@ -19,11 +19,12 @@ import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
 import { ImSpinner8 } from "react-icons/im"
 import { useRouter, useSearchParams } from "next/navigation"
-import { MagicBackButton } from "../MagicBackButton"
+import { MagicBackButton } from "../button/MagicBackButton"
 import { FaPlus } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
+import { Separator } from "@/components/ui/separator"
 
-const CreateTeamForm = () => {
+const EventRegistrationForm = () => {
 
     const router = useRouter()
     const searchParams = useSearchParams();
@@ -46,7 +47,7 @@ const CreateTeamForm = () => {
     useEffect(() => {
         if (error)
             toast({ description: error.toString(), variant: "destructive" })
-    }, [error, toast]);
+    }, [error]);
 
     async function onSubmit(values: TeamSchema) {
 
@@ -68,7 +69,7 @@ const CreateTeamForm = () => {
         <Form {...form}>
             <form className="" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="mb-4">
-                    <div className="flex justify-between items- mb-4">
+                    <div className="flex justify-between items-center mb-4">   
                         <MagicBackButton type="button"/>
                         <Button
                             type="submit"
@@ -82,6 +83,10 @@ const CreateTeamForm = () => {
                         }
                         </Button>
                     </div>
+                    <span className="text-4xl">
+                        {eventName}
+                    </span>
+                    <Separator className="my-4"/>
                     <FormField
                         control={form.control}
                         name="teamName"
@@ -184,4 +189,4 @@ const CreateTeamForm = () => {
 
 }
 
-export default CreateTeamForm
+export default EventRegistrationForm

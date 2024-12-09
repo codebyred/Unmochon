@@ -36,7 +36,7 @@ import { useRouter } from "next/navigation"
 import { TimePicker } from "@/components/timepicker/Timepicker"
 import { toast, useToast } from "@/hooks/use-toast"
 import DeleteButton from "../DeleteButton"
-import { MagicBackButton } from "@/components/MagicBackButton"
+import { MagicBackButton } from "@/components/button/MagicBackButton"
 
 type UpdateEventFormProps = {
     event: InsertEventSchema

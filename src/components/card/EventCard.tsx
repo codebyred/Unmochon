@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { hasPermission } from "@/lib/auth";
 import { currentUser, User } from "@clerk/nextjs/server";
-import { isPastLastDateOfEventRegistration } from "@/lib/utils";
+import { isRegistrationClosed } from "@/lib/utils";
 import { format } from "date-fns";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 
@@ -39,20 +39,17 @@ const EventItem = async (props: EventItemProps) => {
                 <Separator/>
             </CardHeader>
             <CardContent className="flex h-[160px] overflow-y-hidden">
-                {isPastLastDateOfEventRegistration(event.lastDateOfRegistration)
-                    &&
-                    event.lastDateOfRegistration
-                    ?
-                    <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Event registration is closed</p>
-                    :
-                    <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Registration deadline: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}</p>
+                {
+                    isRegistrationClosed(event.lastDateOfRegistration)
+                    ? <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Event registration is closed</p>
+                    : <p className="text-red-500 flex items-center gap-2 text-normal"><AiOutlineExclamationCircle/>Registration deadline: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}</p>
                 }         
             </CardContent>
             <CardFooter className="flex flex-col items-center justify-center">
                 <Button asChild>
                     <Link href={
                         hasPermission(user, "update:events")?`/events/update/${event.id}`
-                        :hasPermission(user,"register:events")?`/events/register/${event.id}`
+                        :hasPermission(user,"view:events")?`/events/${event.id}`
                         :`/events/${event.id}`
                     }>
                         view

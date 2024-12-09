@@ -26,7 +26,7 @@ import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { TimePicker } from "@/components/timepicker/Timepicker"
-import { MagicBackButton } from "@/components/MagicBackButton"
+import { MagicBackButton } from "@/components/button/MagicBackButton"
 
 
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
     Breadcrumb,
@@ -6,42 +6,44 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation"
+import { usePathname } from "next/navigation";
 import { validate as isUuid } from "uuid";
 
-const NavbarTitle = ({className}:{className?:string}) => {
-
+const NavbarTitle = ({ className }: { className?: string }) => {
     const pathname = usePathname();
 
+    // Filter the path segments
     const pathSegments = pathname
         .split("/")
-        .filter(segment => {
+        .filter((segment) => {
             return (
-                segment &&
-                !isUuid(segment) && // Use `uuid` package to check if the segment is a UUID
-                !["error", "success"].includes(segment) // Filter out "error" and "success"
+                segment && // Non-empty
+                isNaN(Number(segment)) && // Exclude numbers
+                !isUuid(segment) && // Exclude UUIDs
+                !segment.includes("?") // Exclude query parameters
             );
         });
 
     return (
         <Breadcrumb className={cn("", className)}>
-            <BreadcrumbList>{
-                pathSegments.map((path) => (
-                    <div key={Math.floor(Math.random() * 1000)} className="flex items-center justify-center">
+            <BreadcrumbList>
+                {pathSegments.map((path, index) => (
+                    <div key={index} className="flex items-center justify-center">
                         <BreadcrumbItem>
-                            <BreadcrumbLink href={`${path}`}>
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 capitalize">{path}</h1>
+                            <BreadcrumbLink href={`/${path}`}>
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 capitalize">
+                                    {path.replace(/-/g, " ")} {/* Replace hyphens with spaces */}
+                                </h1>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
+                        {index < pathSegments.length - 1 && <BreadcrumbSeparator />}
                     </div>
-                ))
-            }
+                ))}
             </BreadcrumbList>
         </Breadcrumb>
-    )
-}
+    );
+};
 
 export default NavbarTitle;

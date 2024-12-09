@@ -33,7 +33,7 @@ const MemberTable = (props: MemberTableProps) => {
                 {props.data.map((item) => (
                     <TableRow key={item.memberId}>
                         <TableCell>{item.memberId}</TableCell>
-                        <TableCell>{item.memberName}</TableCell>
+                        <TableCell>{item.memberEmail}</TableCell>
                         <TableCell>{item.memberName}</TableCell>
                     </TableRow>
                 ))}

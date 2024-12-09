@@ -210,7 +210,7 @@ export function display12HourValue(hours: number) {
   return `0${hours % 12}`;
 }
 
-export function isPastLastDateOfEventRegistration(lastDateOfRegistration: Date): boolean {
+export function isRegistrationClosed(lastDateOfRegistration: Date): boolean {
 
   const currentDateIsAfterLastDateOfRegistration = 1;
   const currentDateIsBeforeLastDateOfRegistration = -1;

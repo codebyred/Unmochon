@@ -41,6 +41,22 @@ export const teamMembers = pgTable("teamMembers",{
     memberId: varchar("memberId").references(()=> students.id, {onDelete:'cascade'}).notNull(),
 });
 
+export const projects = pgTable("projects",{
+    id: uuid("id").primaryKey().defaultRandom(),
+    teamId: uuid("teamId").references(()=> teams.id, {onDelete:'cascade'}).notNull(),
+    eventId: uuid("eventId").references(()=> events.id, {onDelete:'cascade'}).notNull(),
+    name: varchar("name").notNull(),
+    description: text("description").notNull(),
+    submittedAt: timestamp("submittedAt").defaultNow().notNull()
+});
+
+export const projectMedia = pgTable("projectMedia",{
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("projectId").references(()=> projects.id, {onDelete:'cascade'}).notNull(),
+    mediaUrl: varchar("mediaUrl").notNull(),
+    mediaType: varchar("mediaType").notNull()
+})
+
 export const InsertStudentSchema = createInsertSchema(students,{
     id: (schema) => schema.id.min(7).max(10).regex(/^\d+$/, "ID must contain only digits"),
     email: (schema) => schema.email.email()
@@ -52,11 +68,20 @@ export const TeamSchema = z.object({
     members: z.array(InsertStudentSchema).min(1).max(6)
 })
 
+export const InsertProjectSchema = createInsertSchema(projects,{
+    teamId: (schema) => schema.teamId.optional(),
+    eventId: (schema) => schema.eventId.optional(),
+    name: (schema) => schema.name.min(3).max(50),
+    description: (schema) => schema.description.min(10).max(4000),
+});
+
 export const InsertEventSchema = createInsertSchema(events);
+
+export const InsertActionLog = createInsertSchema(actionLogs);
 
 export type InsertEventSchema = z.infer<typeof InsertEventSchema>
 
-export const InsertActionLog = createInsertSchema(actionLogs);
+export type InsertProjectSchema = z.infer<typeof InsertProjectSchema>
 
 export type InsertActionLog = z.infer<typeof InsertActionLog>
 

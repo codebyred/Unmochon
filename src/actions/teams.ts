@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { TeamSchema, events, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
@@ -134,4 +134,31 @@ export async function getTeamInfo(teamId: string) {
         .where(eq(teamMembers.teamId, teamId));
 
     return rows
+}
+
+export async function getStudentTeamId(email: string, eventId: string) {
+
+    try{
+        const rows = await db
+        .select({
+            teamId: teamMembers.teamId
+        })
+        .from(teamMembers)
+        .innerJoin(students,eq(students.id, teamMembers.memberId))
+        .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+        .innerJoin(events, eq(events.id, teams.eventId))
+        .where(and(eq(students.email, email), eq(events.id, eventId)))
+
+
+        return {
+            error: "",
+            result: rows
+        }
+    }catch(err){
+        return {
+            error: "Student team information not found",
+            result: []
+        }
+    }
+
 }

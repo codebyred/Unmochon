@@ -22,6 +22,13 @@
       "when": 1732434291556,
       "tag": "0002_old_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1734784998193,
+      "tag": "0003_sweet_prima",
+      "breakpoints": true
     }
   ]
 }

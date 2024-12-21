@@ -36,7 +36,10 @@ const ViewEvent = async ({
                         isRegistrationClosed(event.lastDateOfRegistration)
                             ?
                             <Link href={{
-                                pathname: `/teams/projects/submission`,
+                                pathname: `/projects/submission/step-one`,
+                                query: {
+                                    eventId: event.id
+                                }
                             }}>
                                 Submit Project
                             </Link>

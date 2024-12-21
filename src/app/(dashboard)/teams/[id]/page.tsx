@@ -11,36 +11,31 @@ const TeamView = async ({
     params: Promise<{ id: string }>
 }) => {
 
-
     const teamId = (await params).id;
     const teamInfo = await getTeamInfo(teamId);
 
     return (
-
         <div className="grow shadow-custom p-4 rounded-lg text-xl">
-            <div className="flex justify-between">
-                <div className="flex gap-4">
-                    <MagicButtonContainer/>
-                    <div className="flex flex-col"> 
-                        <span className="text-4xl">
-                            {
-                                teamInfo.at(0)?.teamName.toLowerCase().includes('team')
-                                ?`${teamInfo.at(0)?.teamName}`
-                                :`Team ${teamInfo.at(0)?.teamName}`
-                            }
-                        </span>
-                        <span className="text-xl font-thin">
-                            {teamInfo.at(0)?.eventName}
-                        </span>  
-                    </div>
-                </div>
+            <div className="flex justify-between mb-4">              
+                <MagicButtonContainer/>
                 <Button asChild>
                     <Link href={`/teams/projects/${123}`}>
                         view project
                     </Link>
                 </Button>
             </div>
-
+            <div className="flex flex-col"> 
+                <span className="text-4xl">
+                    {
+                        teamInfo.at(0)?.teamName.toLowerCase().includes('team')
+                        ?`${teamInfo.at(0)?.teamName}`
+                        :`Team ${teamInfo.at(0)?.teamName}`
+                    }
+                </span>
+                <span className="text-xl font-thin">
+                    Event: {teamInfo.at(0)?.eventName}
+                </span>  
+            </div>
             <Separator className="my-4"/>
             {
                 <MemberTable
@@ -54,7 +49,6 @@ const TeamView = async ({
                 />
             }
         </div>
-
     )
 }
 

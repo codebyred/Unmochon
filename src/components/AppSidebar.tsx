@@ -20,6 +20,7 @@ import { FaRegClipboard } from "react-icons/fa";
 import { RiTeamFill } from "react-icons/ri";
 import { usePathname } from "next/navigation";
 import { MdHistory } from "react-icons/md";
+import OrganizerMenu from "./sidebar/OrganizerMenu";
 
 const sidebarItems = [
     {
@@ -44,11 +45,12 @@ const sidebarItems = [
     }
 ]
 
+
+
+
 type SidebarProps = React.ButtonHTMLAttributes<HTMLButtonElement>
 
 const AppSidebar = ({ className }: SidebarProps) => {
-
-    const pathname = usePathname();
 
     return (
         <Sidebar className={cn("flex flex-col", className)}>
@@ -65,23 +67,7 @@ const AppSidebar = ({ className }: SidebarProps) => {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {
-                                sidebarItems.map((item, index) => {
-
-                                    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-                                    return <SidebarMenuItem
-                                        key={(index + 1) * 1000}
-                                    >
-                                        <SidebarMenuButton asChild className={cn("hover:bg-slate-100", { 'bg-slate-100 text-blue-500': isActive })}>
-                                            <Link href={item.href.toLowerCase()}>
-                                                <item.icon />
-                                                <span>{item.label}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                })
-                            }
+                            <OrganizerMenu/>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

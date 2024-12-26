@@ -5,13 +5,23 @@ import {
     type FileState,
 } from '@/components/MultiImageDropzone';
 import { useEdgeStore } from '@/lib/edgestore';
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MagicBackButton } from '@/components/button/MagicBackButton';
+import { createProjectMedia } from '@/actions/projects';
+import { InsertProjectMediaSchema } from '@/db/schema';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from '@/hooks/use-toast';
 
 export default function Fileupload() {
     const [fileStates, setFileStates] = useState<FileState[]>([]);
     const { edgestore } = useEdgeStore();
+    const searchParams = useSearchParams();
+    const router = useRouter();
+                
+    const projectId = searchParams.get('projectId');
+
+    if(projectId === null) return <div>You have not submitted project name and description</div>
 
     function updateFileProgress(key: string, progress: FileState['progress']) {
         setFileStates((fileStates) => {
@@ -46,6 +56,25 @@ export default function Fileupload() {
                                         }
                                     },
                                 });
+
+                                
+                                const media: InsertProjectMediaSchema = {
+                                    projectId,
+                                    mediaUrl: res.url,
+                                    mediaType: 'IMAGE',
+                                }
+
+                                const {error, result} = await createProjectMedia(JSON.stringify(media))
+
+                                if(error){
+                                    throw new Error(error)
+                                }
+
+                                toast({
+                                    title: "Success",
+                                    description: "File uploaded successfully",
+                                })
+                
                             } catch (err) {
                                 updateFileProgress(fileState.key, 'ERROR');
                             }

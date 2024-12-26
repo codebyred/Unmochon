@@ -13,7 +13,7 @@ export type Permission =
   | "create:team"
   | "view:evaluationboard"
   | "delete:team"
-
+  | "ban:team"
 
 
 type UserPermissions = {

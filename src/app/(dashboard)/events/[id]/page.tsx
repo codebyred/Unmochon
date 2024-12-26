@@ -1,15 +1,15 @@
 import { getEvent } from "@/actions/events";
-import { MagicBackButton } from "@/components/button/MagicBackButton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { isRegistrationClosed } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
-import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { FaCalendarTimes } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import MagicButtonContainer from "@/components/button/MagicButtonContainer";
 import { InsertEventSchema } from "@/db/schema";
+import { getProject } from "@/actions/projects";
+import { redirect } from "next/navigation";
 
 const ViewEvent = async ({
     params,
@@ -27,6 +27,8 @@ const ViewEvent = async ({
 
     const event = result.at(0) as InsertEventSchema;
 
+    const {result: project} = await getProject(eventId as string);
+
     return (
         <div className="shadow-custom p-4 rounded-lg grow">
             <div className="flex justify-between mb-4">          
@@ -35,12 +37,22 @@ const ViewEvent = async ({
                     {
                         isRegistrationClosed(event.lastDateOfRegistration)
                             ?
-                            <Link href={{
-                                pathname: `/projects/submission/step-one`,
-                                query: {
-                                    eventId: event.id
+                            <Link href={
+                                project?
+                                {
+                                    pathname: `/projects/submission/step-two`,
+                                    query: {
+                                        projectId: project.id
+                                    }
                                 }
-                            }}>
+                                :
+                                {
+                                    pathname: `/projects/submission/step-one`,
+                                    query: {
+                                        eventId: event.id
+                                    }
+                                }
+                            }>
                                 Submit Project
                             </Link>
 

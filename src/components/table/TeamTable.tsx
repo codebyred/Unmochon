@@ -7,18 +7,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { deleteTeam } from "@/actions/teams"
-import DeleteButton from "@/components/DeleteButton"
-import Link from "next/link"
 import { currentUser } from "@clerk/nextjs/server"
-import { hasPermission } from "@/lib/auth"
-
+import TeamTableActions from "./TeamTableActions"
+import { isEventOrganizer, isStudent } from "@/lib/auth"
 
 type Data = {
     teamId: string
     teamName: string
     eventName: string
+    isBanned: boolean
 }
 
 type TeamTableProps = {
@@ -55,21 +52,13 @@ export const TeamTable = async (props: TeamTableProps) => {
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
                         <TableCell>
-                            <div className="flex gap-2">
-                                <Button asChild>
-                                    <Link href={`/teams/${item.teamId}`}>
-                                        View
-                                    </Link>
-                                </Button>
-                                {
-                                    hasPermission(user, "delete:team")
-                                    &&
-                                    <DeleteButton
-                                        itemId={item.teamId}
-                                        itemName="Team"
-                                        serverAction={deleteTeam}
-                                    />}
-                            </div>
+                            <TeamTableActions
+                                teamId={item.teamId}
+                                user={
+                                    isStudent(user)?"student": isEventOrganizer(user)?"organizer":"faculty"
+                                }
+                                isBanned={item?.isBanned}
+                            />
                         </TableCell>
                     </TableRow>
                 ))}
@@ -79,5 +68,7 @@ export const TeamTable = async (props: TeamTableProps) => {
         </Table>
     )
 }
+
+
 
 export default TeamTable

@@ -35,7 +35,6 @@ import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { TimePicker } from "@/components/timepicker/Timepicker"
 import { toast, useToast } from "@/hooks/use-toast"
-import DeleteButton from "../DeleteButton"
 import { MagicBackButton } from "@/components/button/MagicBackButton"
 
 type UpdateEventFormProps = {
@@ -102,10 +101,8 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                                     : "Update"
                             }
                         </Button>
-                        <DeleteButton
+                        <DeleteEventButton
                             itemId={event.id as string}
-                            itemName={event.eventName}
-                            serverAction={deleteEvent}
                         />
                     </div>
                 </div>
@@ -260,7 +257,6 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
 
 type DeleteButtonProps = {
     itemId: string
-    itemName: string
 }
 
 const DeleteEventButton = (props: DeleteButtonProps) => {
@@ -270,7 +266,7 @@ const DeleteEventButton = (props: DeleteButtonProps) => {
     function handleClick() {
         startTransition(() => {
             formAction(props.itemId);
-            toast({ description: `${props.itemName} deleted successfully` })
+            toast({ description: `Event deleted successfully` })
         })
     }
 

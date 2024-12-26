@@ -1,4 +1,4 @@
-import { hasPermission, isEventOrganizer, isStudent } from "@/lib/auth";
+import { hasPermission, isEventOrganizer } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { Calendar } from "@/components/ui/calendar"
 import DashboardCard from "@/components/card/DashboardCard";
@@ -6,10 +6,8 @@ import Analytics from "@/components/chart/Analytics";
 import { getEvents } from "@/actions/events";
 import { getStudentTeams } from "@/actions/teams";
 import { v4 } from "uuid";
-import StudentDashboard from "@/components/dashboard/StudentDashboard";
 
-const Dashboard = async () => {
-
+const OrganizerDashboard = async() => {
     const user = await currentUser();
     const [error,events] = await getEvents();
 
@@ -23,12 +21,7 @@ const Dashboard = async () => {
 
     let myteams: number = 0;
 
-    if(hasPermission(user, "view:ownteams")) {
-        const teams = await getStudentTeams(user.emailAddresses.at(0)?.emailAddress as string)
-        myteams = teams.length;
-    }
-
-    if(isEventOrganizer(user)) return (
+    return (
         <div className="flex p-4 grow">
             {/*LEFT */}
             <div className="flex flex-col grow mr-4">
@@ -58,7 +51,7 @@ const Dashboard = async () => {
                     />
                 </div>
                 <div>
-                    <Analytics className="mt-4 mb-4"/>
+                    <Analytics className="mt-4 mb-4" />
                 </div>
             </div>
 
@@ -80,11 +73,6 @@ const Dashboard = async () => {
             </div>
         </div>
     )
-    if(isStudent(user)) return (
-        <StudentDashboard/>
-    )
-
 }
 
-
-export default Dashboard;
+export default OrganizerDashboard;

@@ -48,12 +48,12 @@ const ProjectForm = () => {
                 variant: "destructive" 
             })
         
-        else if(result?.message){
+        else if(result?.projectId) {
             toast({ 
                 title: "Success",
                 description: "Project submitted successfully" 
             })
-            router.push('/home')
+            router.push(`/projects/submission/step-two?projectId=${result?.projectId}`)
         } 
 
     }, [result]);

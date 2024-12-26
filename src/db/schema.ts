@@ -1,4 +1,4 @@
-import { integer, text, pgTable, varchar, uuid, timestamp, serial, uniqueIndex } from "drizzle-orm/pg-core";
+import {boolean, integer, text, pgTable, varchar, uuid, timestamp, serial, uniqueIndex, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -23,7 +23,8 @@ export const actionLogs = pgTable("actionLogs", {
 export const teams = pgTable("teams", {
     id:uuid("id").primaryKey().defaultRandom(),
     name:varchar("name").notNull(),  
-    eventId: uuid("eventId").notNull().references(()=> events.id, {onDelete:'cascade'})
+    eventId: uuid("eventId").notNull().references(()=> events.id, {onDelete:'cascade'}),
+    banned: boolean("banned").default(false).notNull()
 });
 
 export const students = pgTable("students", {
@@ -57,6 +58,16 @@ export const projectMedia = pgTable("projectMedia",{
     mediaType: varchar("mediaType").notNull()
 })
 
+export const designationEnum = pgEnum("designation",["Assistant Professor", "Associate Professor", "Professor", "lecuturer"]);
+
+export const facutly = pgTable("faculty",{  
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: varchar("email").notNull(),
+    name: varchar("name").notNull(),
+    department: varchar("department").notNull(),
+    designation: designationEnum().notNull()
+})
+
 export const InsertStudentSchema = createInsertSchema(students,{
     id: (schema) => schema.id.min(7).max(10).regex(/^\d+$/, "ID must contain only digits"),
     email: (schema) => schema.email.email()
@@ -77,17 +88,21 @@ export const InsertProjectSchema = createInsertSchema(projects,{
 
 export const InsertEventSchema = createInsertSchema(events);
 
-export const InsertActionLog = createInsertSchema(actionLogs);
+export const InsertActionLogSchema = createInsertSchema(actionLogs);
+
+export const InsertProjectMediaSchema = createInsertSchema(projectMedia)
 
 export type InsertEventSchema = z.infer<typeof InsertEventSchema>
 
 export type InsertProjectSchema = z.infer<typeof InsertProjectSchema>
 
-export type InsertActionLog = z.infer<typeof InsertActionLog>
+export type InsertActionLogSchema = z.infer<typeof InsertActionLogSchema>
 
 export type InsertStudentSchema = z.infer<typeof InsertStudentSchema>
 
 export type TeamSchema = z.infer<typeof TeamSchema>
+
+export type InsertProjectMediaSchema = z.infer<typeof InsertProjectMediaSchema>
   
 
 

@@ -65,6 +65,7 @@ export async function getAllTeams() {
                 teamId: teams.id,
                 teamName: teams.name,
                 isBanned: teams.banned,
+                isEvaluated: teams.evaluated,
                 eventName: events.eventName,
             })
             .from(teams)

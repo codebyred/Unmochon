@@ -47,7 +47,6 @@ const userPermissions: UserPermissions = {
 
 export function hasPermission(user: User, action: Permission): boolean {
 
-
   let role: Role = "other";
   if(isStudent(user)){
     role = "student";
@@ -73,7 +72,7 @@ export function isFaculty(user: User): boolean {
 }
 
 export function isEventOrganizer(user: User): boolean {
-  const eventOrganizer = ["nazmulhaqueredoan@gmail.com"];
+  const eventOrganizer: string[] = [];
   return eventOrganizer.includes(user.emailAddresses.at(0)?.emailAddress as string);
 }
   

@@ -2,24 +2,14 @@
 
 import { cn } from "@/lib/utils";
 import {
-    Sidebar,
-    SidebarContent,
     SidebarMenuButton,
-    SidebarHeader,
-    SidebarMenu,
     SidebarMenuItem,
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarGroupContent,
 } from "@/components/ui/sidebar"
-import Image from "next/image"
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 import { MdOutlineEmojiEvents } from "react-icons/md";
-import { FaRegClipboard } from "react-icons/fa";
 import { RiTeamFill } from "react-icons/ri";
 import { usePathname } from "next/navigation";
-import { MdHistory } from "react-icons/md";
 
 const STUDENT_SIDEBAR_ITEMS = [
     {

@@ -21,10 +21,11 @@ export const actionLogs = pgTable("actionLogs", {
 });
 
 export const teams = pgTable("teams", {
-    id:uuid("id").primaryKey().defaultRandom(),
-    name:varchar("name").notNull(),  
-    eventId: uuid("eventId").notNull().references(()=> events.id, {onDelete:'cascade'}),
-    banned: boolean("banned").default(false).notNull()
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name").notNull(),
+    eventId: uuid("eventId").notNull().references(() => events.id, { onDelete: 'cascade' }),
+    banned: boolean("banned").default(false).notNull(),
+    evaluated: boolean("evaluated").default(false).notNull() 
 });
 
 export const students = pgTable("students", {
@@ -68,6 +69,15 @@ export const facutly = pgTable("faculty",{
     designation: designationEnum().notNull()
 })
 
+// Create evaluation table
+export const evaluations = pgTable("evaluations", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    teamId: uuid("teamId").references(() => teams.id, { onDelete: 'cascade' }).notNull(),
+    evaluatorId: uuid("evaluatorId").notNull(), // Assuming evaluatorId is a UUID
+    score: integer("score").notNull(),
+    comments: text("comments")
+});
+
 export const InsertStudentSchema = createInsertSchema(students,{
     id: (schema) => schema.id.min(7).max(10).regex(/^\d+$/, "ID must contain only digits"),
     email: (schema) => schema.email.email()
@@ -103,7 +113,7 @@ export type InsertStudentSchema = z.infer<typeof InsertStudentSchema>
 export type TeamSchema = z.infer<typeof TeamSchema>
 
 export type InsertProjectMediaSchema = z.infer<typeof InsertProjectMediaSchema>
-  
+
 
 
 

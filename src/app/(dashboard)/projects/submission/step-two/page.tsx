@@ -1,5 +1,5 @@
 import { getTeamId } from "@/actions/teams";
-import Fileupload from "@/components/Fileupload";
+import Fileupload from "@/components/input/Fileupload";
 import { currentUser } from "@clerk/nextjs/server";
 
 const ProjectSubmission = async({

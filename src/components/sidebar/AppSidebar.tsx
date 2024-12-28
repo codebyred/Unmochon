@@ -1,5 +1,3 @@
-"use client"
-
 import { cn } from "@/lib/utils";
 import {
     Sidebar,
@@ -14,43 +12,22 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link";
-import { FaHome } from "react-icons/fa";
-import { MdOutlineEmojiEvents } from "react-icons/md";
-import { FaRegClipboard } from "react-icons/fa";
-import { RiTeamFill } from "react-icons/ri";
-import { usePathname } from "next/navigation";
 import { MdHistory } from "react-icons/md";
-import OrganizerMenu from "./sidebar/OrganizerMenu";
-
-const sidebarItems = [
-    {
-        icon: FaHome,
-        label: "Home",
-        href: "/home",
-    },
-    {
-        icon: MdOutlineEmojiEvents,
-        label: "Events",
-        href: "/events",
-    },
-    {
-        icon: FaRegClipboard,
-        label: "Evaluation",
-        href: "/evaluation",
-    },
-    {
-        icon: RiTeamFill,
-        label: "Teams",
-        href: "/teams",
-    }
-]
-
-
-
+import OrganizerMenu from "./OrganizerMenu";
+import { currentUser } from "@clerk/nextjs/server";
+import { isEventOrganizer, isFaculty, isStudent } from "@/lib/auth";
+import StudentMenu from "./StudentMenu";
+import FacultyMenu from "./FacultyMenu";
 
 type SidebarProps = React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const AppSidebar = ({ className }: SidebarProps) => {
+const AppSidebar = async({ className }: SidebarProps) => {
+
+    const user = await currentUser();
+
+    if(!user) return (
+        <></>
+    )
 
     return (
         <Sidebar className={cn("flex flex-col", className)}>
@@ -67,7 +44,15 @@ const AppSidebar = ({ className }: SidebarProps) => {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            <OrganizerMenu/>
+                            {
+                                isEventOrganizer(user)?
+                                <OrganizerMenu/>
+                                :isStudent(user)?
+                                <StudentMenu/>
+                                :isFaculty(user)?
+                                <FacultyMenu/>
+                                :<></>
+                            }     
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

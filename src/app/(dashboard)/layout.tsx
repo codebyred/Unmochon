@@ -1,4 +1,4 @@
-import AppSidebar from "@/components/AppSidebar";
+import AppSidebar from "@/components/sidebar/AppSidebar";
 import Navbar from "@/components/navbar/Navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";

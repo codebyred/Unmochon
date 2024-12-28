@@ -3,7 +3,7 @@
 import {
     MultiImageDropzone,
     type FileState,
-} from '@/components/MultiImageDropzone';
+} from '@/components/input/MultiImageDropzone';
 import { useEdgeStore } from '@/lib/edgestore';
 import { startTransition, useState } from 'react';
 import { Button } from '@/components/ui/button';

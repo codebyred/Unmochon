@@ -1,3 +1,4 @@
+import { getProjectsByTeamId } from "@/actions/projects";
 import { getTeamInfo } from "@/actions/teams";
 import MagicButtonContainer from "@/components/button/MagicButtonContainer";
 import MemberTable from "@/components/table/MemberTable";
@@ -13,16 +14,22 @@ const TeamView = async ({
 
     const teamId = (await params).id;
     const teamInfo = await getTeamInfo(teamId);
+    const {error, result} = await getProjectsByTeamId(teamId)
 
     return (
         <div className="grow shadow-custom p-4 rounded-lg text-xl">
             <div className="flex justify-between mb-4">              
                 <MagicButtonContainer/>
-                <Button asChild>
-                    <Link href={`/teams/projects/${123}`}>
-                        view project
-                    </Link>
-                </Button>
+                {
+                    result && result.length === 0 ?
+                    <div>No project submitted</div>
+                    :<Button asChild>
+                        <Link href={`/projects/${result?.at(0)?.id as string}`}>
+                            view project
+                        </Link>
+                    </Button>
+                }
+
             </div>
             <div className="flex flex-col"> 
                 <span className="text-4xl">

@@ -77,40 +77,59 @@ export async function createProject(previoudState:unknown, data: string) {
 
 }
 
-export async function getProject(eventId: string) {
+export async function getProjectsByTeamId(teamId: string) {
 
-    try{
-
-        const {error, result} = await getTeamId(eventId);
-
-        if (error) {
-            throw new ValidationError(error);
-        }
-
-        if(result.length === 0) {
-            throw new ValidationError("Student team information not found");
-        }
+    try {
 
         const project = await db.select()
             .from(projects)
-            .where(and(eq(projects.eventId, eventId), eq(projects.teamId, result.at(0)?.teamId as string)))
+            .where(eq(projects.teamId, teamId));
 
-
-        if(project.length === 0) { 
-            throw new ValidationError("Project not found");
-        }
+        return { error: null, result: project as InsertProjectSchema[] };
     
-        return {error: null, result: project.at(0) as InsertProjectSchema};
-
-    }catch(error) {
+    } catch (error) {
         if (error instanceof ValidationError) {
-            return { error: error.message, result: null};
+            return { error: error.message, result: null };
         } else {
             console.error("Unexpected error:", error);
             return { error: "An unexpected error occurred", result: null };
         }
     }
+}
 
+export async function getProjectsByProjectId(projectId: string) {
+
+    try {
+
+        const project = await db.select({
+            projectId: projects.id,
+            projectName: projects.name,
+            projectDescription: projects.description,
+            projectMediaUrl: projectMedia.mediaUrl
+        })
+            .from(projects)
+            .innerJoin(projectMedia, eq(projectMedia.projectId, projects.id))
+            .where(eq(projects.id, projectId));
+
+        return { 
+            error: null, 
+            result: project 
+        };
+
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return { 
+                error: error.message, 
+                result: [] 
+            };
+        } else {
+            console.error("Unexpected error:", error);
+            return { 
+                error: "An unexpected error occurred", 
+                result: [] 
+            };
+        }
+    }
 }
 
 export async function createProjectMedia(data: string) {

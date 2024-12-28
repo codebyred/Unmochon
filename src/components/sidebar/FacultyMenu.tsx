@@ -11,16 +11,11 @@ import { MdOutlineEmojiEvents } from "react-icons/md";
 import { RiTeamFill } from "react-icons/ri";
 import { usePathname } from "next/navigation";
 
-const EVENT_ORGANIZER_SIDEBAR_ITEMS = [
+const FACULTY_SIDEBAR_ITEMS = [
     {
         icon: FaHome,
         label: "Home",
         href: "/home",
-    },
-    {
-        icon: MdOutlineEmojiEvents,
-        label: "Events",
-        href: "/events",
     },
     {
         icon: RiTeamFill,
@@ -29,14 +24,14 @@ const EVENT_ORGANIZER_SIDEBAR_ITEMS = [
     }
 ]
 
-const OrganizerMenu = () => {
+const FacultyMenu = () => {
     
     const pathname = usePathname();
 
     return <>
     {
 
-        EVENT_ORGANIZER_SIDEBAR_ITEMS.map((item, index) => {
+        FACULTY_SIDEBAR_ITEMS.map((item, index) => {
 
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -53,7 +48,6 @@ const OrganizerMenu = () => {
         })
     }
     </>
-
 }
 
-export default OrganizerMenu
+export default FacultyMenu

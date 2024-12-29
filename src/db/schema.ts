@@ -69,13 +69,14 @@ export const facutly = pgTable("faculty",{
     designation: designationEnum().notNull()
 })
 
-// Create evaluation table
+
 export const evaluations = pgTable("evaluations", {
     id: uuid("id").primaryKey().defaultRandom(),
     teamId: uuid("teamId").references(() => teams.id, { onDelete: 'cascade' }).notNull(),
-    evaluatorId: uuid("evaluatorId").notNull(), // Assuming evaluatorId is a UUID
-    score: integer("score").notNull(),
-    comments: text("comments")
+    evaluatorId: uuid("evaluator_id").notNull().references(()=> facutly.id, {onDelete: 'cascade'}),
+    presentationScore: integer("presentation_score").notNull(),
+    outcomeScore: integer("outcome_score").notNull(),
+    technologyScore: integer("technology_score").notNull(),
 });
 
 export const InsertStudentSchema = createInsertSchema(students,{
@@ -102,6 +103,8 @@ export const InsertActionLogSchema = createInsertSchema(actionLogs);
 
 export const InsertProjectMediaSchema = createInsertSchema(projectMedia)
 
+export const InsertEvaluationSchema = createInsertSchema(evaluations);
+
 export type InsertEventSchema = z.infer<typeof InsertEventSchema>
 
 export type InsertProjectSchema = z.infer<typeof InsertProjectSchema>
@@ -113,6 +116,8 @@ export type InsertStudentSchema = z.infer<typeof InsertStudentSchema>
 export type TeamSchema = z.infer<typeof TeamSchema>
 
 export type InsertProjectMediaSchema = z.infer<typeof InsertProjectMediaSchema>
+
+export type InsertEvaluationSchema = z.infer<typeof InsertEvaluationSchema>
 
 
 

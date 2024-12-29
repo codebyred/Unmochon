@@ -2,7 +2,20 @@ import { getProjectsByProjectId } from "@/actions/projects";
 import BackButton from "@/components/button/BackButton";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import Link from "next/link";
+import { Copy } from "lucide-react"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import EvaluationForm from "@/components/form/EvaluationForm";
 
 const ViewProject = async({
     params,
@@ -30,9 +43,7 @@ const ViewProject = async({
         <div className="grow shadow-custom p-4 rounded-lg">
             <div className="mb-4 flex justify-between">
                 <BackButton/>
-                <Button>
-                    Evaluate
-                </Button>
+                <EvaluationForm/>
             </div>
             <h1 className="text-2xl font-bold mb-4">Project Name: {result[0].projectName}</h1>
             <p className="mb-4">{result[0].projectDescription}</p>
@@ -55,5 +66,6 @@ const ViewProject = async({
         </div>
     )
 }
+ 
 
 export default ViewProject;

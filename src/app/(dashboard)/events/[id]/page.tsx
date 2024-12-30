@@ -1,15 +1,14 @@
 import { getEvent } from "@/actions/events";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { isRegistrationClosed } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { FaCalendarTimes } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import MagicButtonContainer from "@/components/button/MagicButtonContainer";
 import { InsertEventSchema } from "@/db/schema";
-import { getProject } from "@/actions/projects";
 import { redirect } from "next/navigation";
+import BackButton from "@/components/button/BackButton";
 
 const ViewEvent = async ({
     params,
@@ -19,55 +18,33 @@ const ViewEvent = async ({
 
     const eventId = (await params).id
 
-    const [error, result] = await getEvent(eventId);
+    const {error, result} = await getEvent(eventId);
 
-    if (error !== null || result === null) return (
+    if (error !== null || result.length === 0) return (
         <div>No data found related to event</div>
     )
 
     const event = result.at(0) as InsertEventSchema;
 
-    const {result: project} = await getProject(eventId as string);
+    //const {result: project} = await getProject(eventId as string);
 
     return (
         <div className="shadow-custom p-4 rounded-lg grow">
             <div className="flex justify-between mb-4">          
-                <MagicButtonContainer />
-                <Button asChild>
-                    {
-                        isRegistrationClosed(event.lastDateOfRegistration)
-                            ?
-                            <Link href={
-                                project?
-                                {
-                                    pathname: `/projects/submission/step-two`,
-                                    query: {
-                                        projectId: project.id
-                                    }
-                                }
-                                :
-                                {
-                                    pathname: `/projects/submission/step-one`,
-                                    query: {
-                                        eventId: event.id
-                                    }
-                                }
-                            }>
-                                Submit Project
-                            </Link>
+                <BackButton/>
+                <div className="flex gap-4">
+                    <Button asChild>
+                        <Link href={`/events/${eventId}/register`}>
+                            Registration
+                        </Link>  
+                    </Button>
+                    <Button asChild>
+                        <Link href={`/events/${eventId}/submission`}>
+                            Submit Project
+                        </Link>  
+                    </Button>
+                </div>
 
-                            :
-                            <Link href={{
-                                pathname: `/events/register`,
-                                query: {
-                                    eventName: event.eventName,
-                                    eventId: event.id
-                                }
-                            }}>
-                                Registration
-                            </Link>
-                    }
-                </Button>
             </div>
             <h1 className="text-4xl">
                 {event.eventName}

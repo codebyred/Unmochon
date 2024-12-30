@@ -38,14 +38,7 @@ const TeamTableActions = (props: TeamTableActionsProps) => {
                 </Link>
             </Button>
             {
-                user === "student" && (
-                    <DeleteTeamButton
-                        teamId={teamId}
-                    />
-                )
-            }
-            {
-                user === "organizer" && (
+                (user === "organizer" || user === "faculty") && (
                     <>
                         {
                             isBanned?

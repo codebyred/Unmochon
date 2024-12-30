@@ -2,7 +2,7 @@
 
 import { db } from "@/db/drizzle";
 import { eq, and } from "drizzle-orm";
-import { TeamSchema, events, students, teamMembers, teams } from "@/db/schema";
+import { TeamSchema, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
@@ -88,7 +88,7 @@ export async function getAllTeams() {
 }
 
 type GetAllStudentTeamsResult = { teamId: string, teamName: string, eventName: string, isBanned: boolean }
-export async function getStudentTeams(email: string): Promise<{ error: string | null, result: GetAllStudentTeamsResult[] | null }> {
+export async function getMyTeams(email: string): Promise<{ error: string | null, result: GetAllStudentTeamsResult[] | null }> {
 
     try {
 
@@ -174,21 +174,21 @@ export async function getTeamInfo(teamId: string) {
     return rows
 }
 
-export async function getTeamId(eventId: string) {
+export async function getMyTeamForEvent(eventId: string) {
 
     try {
 
         const user = await currentUser();
 
         if (!user) {
-            throw new Error("Please sign in");
+            redirect('/signin')
         }
 
         const email = user.emailAddresses.at(0)?.emailAddress as string;
 
         const rows = await db
             .select({
-                teamId: teamMembers.teamId
+                teamId: teamMembers.teamId,
             })
             .from(teamMembers)
             .innerJoin(students, eq(students.id, teamMembers.memberId))

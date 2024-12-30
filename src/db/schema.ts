@@ -97,13 +97,19 @@ export const InsertProjectSchema = createInsertSchema(projects,{
     description: (schema) => schema.description.min(10).max(4000),
 });
 
+export const InsertEvaluationSchema = createInsertSchema(evaluations, {
+    presentationScore: (schema) => schema.presentationScore.min(0).max(10),
+    outcomeScore: (schema) => schema.outcomeScore.min(0).max(10),
+    technologyScore: (schema) => schema.technologyScore.min(0).max(10)
+});
+
 export const InsertEventSchema = createInsertSchema(events);
 
 export const InsertActionLogSchema = createInsertSchema(actionLogs);
 
 export const InsertProjectMediaSchema = createInsertSchema(projectMedia)
 
-export const InsertEvaluationSchema = createInsertSchema(evaluations);
+
 
 export type InsertEventSchema = z.infer<typeof InsertEventSchema>
 

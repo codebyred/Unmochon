@@ -24,7 +24,7 @@ const STUDENT_SIDEBAR_ITEMS = [
     },
     {
         icon: RiTeamFill,
-        label: "My Teams",
+        label: "Teams",
         href: "/teams",
     }
 ]

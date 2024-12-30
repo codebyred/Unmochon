@@ -1,6 +1,6 @@
 "use server"
 
-import { InsertEventSchema } from "@/db/schema"
+import { InsertEventSchema, students, teamMembers, teams } from "@/db/schema"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
@@ -8,6 +8,8 @@ import { db } from "@/db/drizzle";
 import { events } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { eventNames } from "process";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function createEvent(previousState: unknown, values: string) {
 
@@ -88,20 +90,37 @@ export async function getEvents():Promise<[Error | null, InsertEventSchema[] | n
 
 }
 
-export async function getEvent(eventId: string):Promise<[Error | null, InsertEventSchema[] | null]>  {
+export async function getEvent(eventId: string) {
 
   try {
 
-    const row = await db.select().from(events).where(eq(events.id, eventId));
+    const rows = await db.select().from(events).where(eq(events.id, eventId));
 
-    if (row.length === 0) {
-      return [new Error("Event not found"), null];
-    }
-
-    return [null, row];
+    return {error: null, result: rows};
 
   } catch (error) {
-    return [new Error("An error occurred while fetching the event"), null];
+    if(error instanceof Error)
+      return {
+        error: error.message, 
+        result: [] as {
+          id: string;
+          eventName: string;
+          lastDateOfRegistration: Date;
+          lastDateOfProjectSubmission: Date;
+          requirements: string;
+      }[]
+      };
+    else
+      return {
+        error: "An unexpected error occurred" , 
+        result: [] as {
+          id: string;
+          eventName: string;
+          lastDateOfRegistration: Date;
+          lastDateOfProjectSubmission: Date;
+          requirements: string;
+        }[]
+      };
   }
   
 }
@@ -120,6 +139,41 @@ export async function deleteEvent(previoudState:unknown, eventId: string){
   redirect('/events');
 
 }
+
+export async function getRegisteredEvents(): Promise<{error: string | null, result: InsertEventSchema[]}> {
+
+  try{
+    
+    const user = await currentUser();
+
+    const userEmail = user?.emailAddresses.at(0)?.emailAddress as string;
+
+    const rows = await db.select( {
+      id: events.id,
+      lastDateOfRegistration: events.lastDateOfRegistration,
+      lastDateOfProjectSubmission: events.lastDateOfProjectSubmission,
+      eventName: events.eventName,
+      requirements: events.requirements 
+    })
+    .from(teamMembers)
+    .innerJoin(students, eq(students.id, teamMembers.memberId))
+    .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+    .innerJoin(events, eq(events.id, teams.eventId))
+    .where(eq(students.email, userEmail))
+
+    return {error: null, result: rows }
+
+  }catch(error){
+    return {
+      error: "An unexpected error occured", 
+      result: []
+    }
+  }
+
+}
+
+
+
 
 
 

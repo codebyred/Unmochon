@@ -18,17 +18,18 @@ import { startTransition, useActionState, useEffect } from "react"
 import { toast } from "@/hooks/use-toast"
 import { ImSpinner8 } from "react-icons/im"
 import { useRouter, useSearchParams } from "next/navigation"
-import { MagicBackButton } from "../button/MagicBackButton"
 import { Textarea } from "@/components/ui/textarea"
 import { createProject } from "@/actions/projects"
+import BackButton from "../button/BackButton"
 
-const ProjectForm = () => {
+type ProjectFormProps = {
+    eventId: string
+}
+
+const ProjectForm = (props: ProjectFormProps) => {
 
     const router = useRouter()
-    const searchParams = useSearchParams();
-    const eventId = searchParams.get('eventId');
-
-    if (!eventId) return <div>No event found</div>
+    const { eventId } = props;
 
     const form = useForm<InsertProjectSchema>({
         resolver: zodResolver(InsertProjectSchema),
@@ -74,7 +75,7 @@ const ProjectForm = () => {
         <Form {...form}>
             <form className="" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="flex justify-between items-center mb-4">
-                    <MagicBackButton type="button" />
+                    <BackButton/>
                     <Button
                         type="submit"
                         disabled={isPending}

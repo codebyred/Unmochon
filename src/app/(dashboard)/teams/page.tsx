@@ -1,4 +1,4 @@
-import { getAllTeams, getStudentTeams } from "@/actions/teams";
+import { getAllTeams, getMyTeams } from "@/actions/teams";
 import { currentUser } from "@clerk/nextjs/server";
 import TeamTable from "@/components/table/TeamTable";
 import { hasPermission, isEventOrganizer, isFaculty, isStudent } from "@/lib/auth";
@@ -48,7 +48,7 @@ type MyTeamsTab = {
 }
 async function TeamsTabForStudent(props: MyTeamsTab) {
     const { studentEmail } = props;
-    const {error: myTeamsErr, result: myTeams} = await getStudentTeams(studentEmail);
+    const {error: myTeamsErr, result: myTeams} = await getMyTeams(studentEmail);
     const {error: allTeamsErr, result: allTeams} = await getAllTeams();
 
     if(myTeamsErr || allTeamsErr) return (
@@ -63,7 +63,7 @@ async function TeamsTabForStudent(props: MyTeamsTab) {
         <Tabs defaultValue="all" className="">
             <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="my">My teams</TabsTrigger>
+                <TabsTrigger value="my">My</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
                 <TeamTable data={allTeams as {

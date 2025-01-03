@@ -44,7 +44,7 @@ const Events = async () => {
 
                                 return <EventCard
                                     key={v4()}
-                                    event={event}
+                                    event={{ ...event, id: event.id as string}}
                                 />
                             })
 
@@ -64,11 +64,19 @@ const Events = async () => {
 
 async function RegisteredEvents() {
     
-    const {error: EventError, result: EventResult} = await getRegisteredEvents();
+    const result = await getRegisteredEvents();
+
+    if(!result.success) return (
+        <div className="flex items-center justify-center grow">
+            No registered events
+        </div>
+    )
+    const { data } = result;
+
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {
-            EventResult.map((event) => {
+            data.events.map((event) => {
 
                 return <EventCard
                     key={v4()}

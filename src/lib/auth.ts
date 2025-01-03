@@ -72,7 +72,8 @@ export function isFaculty(user: User): boolean {
 }
 
 export function isEventOrganizer(user: User): boolean {
-  const eventOrganizer: string[] = [];
+  
+  const eventOrganizer: string[] = ["nazmulhaqueredoan@gmail.com"]
   return eventOrganizer.includes(user.emailAddresses.at(0)?.emailAddress as string);
 }
   

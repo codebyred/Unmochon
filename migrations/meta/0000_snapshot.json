@@ -1,11 +1,11 @@
 {
-  "id": "b9614340-caf8-4947-82c7-c1e8ab63ef41",
+  "id": "6a18055f-dffc-4ca2-9677-88bb77e80090",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.actionLogs": {
-      "name": "actionLogs",
+    "public.action_logs": {
+      "name": "action_logs",
       "schema": "",
       "columns": {
         "id": {
@@ -14,27 +14,21 @@
           "primaryKey": true,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "actionType": {
-          "name": "actionType",
+        "action_type": {
+          "name": "action_type",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "entityType": {
-          "name": "entityType",
+        "entity_type": {
+          "name": "entity_type",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "entityId": {
-          "name": "entityId",
-          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -45,8 +39,8 @@
           "notNull": true,
           "default": "now()"
         },
-        "additionalInfo": {
-          "name": "additionalInfo",
+        "additional_info": {
+          "name": "additional_info",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -54,6 +48,83 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evaluations": {
+      "name": "evaluations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evaluator_id": {
+          "name": "evaluator_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "presentation_score": {
+          "name": "presentation_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outcome_score": {
+          "name": "outcome_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "technology_score": {
+          "name": "technology_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "evaluations_teamId_teams_id_fk": {
+          "name": "evaluations_teamId_teams_id_fk",
+          "tableFrom": "evaluations",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "evaluations_evaluator_id_faculty_id_fk": {
+          "name": "evaluations_evaluator_id_faculty_id_fk",
+          "tableFrom": "evaluations",
+          "tableTo": "faculty",
+          "columnsFrom": [
+            "evaluator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -71,20 +142,20 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "eventName": {
-          "name": "eventName",
+        "name": {
+          "name": "name",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "lastDateOfRegistration": {
-          "name": "lastDateOfRegistration",
+        "registration_deadline": {
+          "name": "registration_deadline",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
-        "lastDateOfProjectSubmission": {
-          "name": "lastDateOfProjectSubmission",
+        "project_submission_deadline": {
+          "name": "project_submission_deadline",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
@@ -98,6 +169,197 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.faculty": {
+      "name": "faculty",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "department": {
+          "name": "department",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "designation": {
+          "name": "designation",
+          "type": "designation",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "faculty_email_idx": {
+          "name": "faculty_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.project_media": {
+      "name": "project_media",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_url": {
+          "name": "media_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "media_type": {
+          "name": "media_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "project_media_project_id_projects_id_fk": {
+          "name": "project_media_project_id_projects_id_fk",
+          "tableFrom": "project_media",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.projects": {
+      "name": "projects",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submitted_at": {
+          "name": "submitted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "projects_team_id_teams_id_fk": {
+          "name": "projects_team_id_teams_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "projects_event_id_events_id_fk": {
+          "name": "projects_event_id_events_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -127,7 +389,23 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "student_email_idx": {
+          "name": "student_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -135,18 +413,18 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.teamMembers": {
-      "name": "teamMembers",
+    "public.team_members": {
+      "name": "team_members",
       "schema": "",
       "columns": {
-        "teamId": {
-          "name": "teamId",
+        "team_id": {
+          "name": "team_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "memberId": {
-          "name": "memberId",
+        "member_id": {
+          "name": "member_id",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
@@ -154,12 +432,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "teamMembers_teamId_teams_id_fk": {
-          "name": "teamMembers_teamId_teams_id_fk",
-          "tableFrom": "teamMembers",
+        "team_members_team_id_teams_id_fk": {
+          "name": "team_members_team_id_teams_id_fk",
+          "tableFrom": "team_members",
           "tableTo": "teams",
           "columnsFrom": [
-            "teamId"
+            "team_id"
           ],
           "columnsTo": [
             "id"
@@ -167,12 +445,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "teamMembers_memberId_students_id_fk": {
-          "name": "teamMembers_memberId_students_id_fk",
-          "tableFrom": "teamMembers",
+        "team_members_member_id_students_id_fk": {
+          "name": "team_members_member_id_students_id_fk",
+          "tableFrom": "team_members",
           "tableTo": "students",
           "columnsFrom": [
-            "memberId"
+            "member_id"
           ],
           "columnsTo": [
             "id"
@@ -204,21 +482,35 @@
           "primaryKey": false,
           "notNull": true
         },
-        "eventId": {
-          "name": "eventId",
+        "event_id": {
+          "name": "event_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "banned": {
+          "name": "banned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "evaluated": {
+          "name": "evaluated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "teams_eventId_events_id_fk": {
-          "name": "teams_eventId_events_id_fk",
+        "teams_event_id_events_id_fk": {
+          "name": "teams_event_id_events_id_fk",
           "tableFrom": "teams",
           "tableTo": "events",
           "columnsFrom": [
-            "eventId"
+            "event_id"
           ],
           "columnsTo": [
             "id"
@@ -234,7 +526,18 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.designation": {
+      "name": "designation",
+      "schema": "public",
+      "values": [
+        "Assistant Professor",
+        "Associate Professor",
+        "Professor",
+        "lecuturer"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

@@ -4,7 +4,6 @@ import { Calendar } from "@/components/ui/calendar"
 import DashboardCard from "@/components/card/DashboardCard";
 import Analytics from "@/components/chart/Analytics";
 import { getEvents } from "@/actions/events";
-import { getStudentTeams } from "@/actions/teams";
 import { v4 } from "uuid";
 
 const OrganizerDashboard = async() => {
@@ -19,36 +18,23 @@ const OrganizerDashboard = async() => {
         <div>An error occured or could not get events</div>
     )
 
-    let myteams: number = 0;
-
     return (
         <div className="flex p-4 grow">
             {/*LEFT */}
             <div className="flex flex-col grow mr-4">
                 <div className="flex justify-between">
-                    {
-                        hasPermission(user, "view:evaluationboard") &&
-                        <DashboardCard
-                            topic="Evaluation board members"
-                            amount="0"
-                        />
-                    }
-                    {
-                        hasPermission(user, "view:ownteams") &&
-                        <DashboardCard
-                            topic="My teams"
-                            amount={`${myteams}`}
-                        />
-                    }
-
                     <DashboardCard
-                        topic="Total Teams"
+                        topic="Number of Events"
+                        amount={`${events.length}`}
+                    />
+                    <DashboardCard
+                        topic="Registered Teams"
                         amount="0"
                     />
                     <DashboardCard
-                        topic="Current Events"
-                        amount={`${events.length}`}
-                    />
+                        topic="Submitted Projects "
+                        amount="0"
+                    /> 
                 </div>
                 <div>
                     <Analytics className="mt-4 mb-4" />
@@ -64,8 +50,8 @@ const OrganizerDashboard = async() => {
                 {
                     events.map((event) => (
                         <div className="shadow-custom rounded-lg p-4" key={v4()}>
-                            <h1 className="text-sm font-bold">{event.eventName}</h1>
-                            <p className="text-sm">last date of registration: {event.lastDateOfRegistration.toDateString()}</p>
+                            <h1 className="text-sm font-bold">{event.name}</h1>
+                            <p className="text-sm">Registration Deadline: {event.registrationDeadline.toDateString()}</p>
                         </div>
                     ))
                 }

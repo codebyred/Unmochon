@@ -11,6 +11,7 @@ const BackButton = () => {
     return (
         <Button
             className="w-12 h-12 rounded-full bg-slate-100 text-black hover:bg-slate-50"
+            type="button"
             onClick={() => router.back()}
         >
             <FaArrowLeft/>

@@ -24,23 +24,67 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { evaluateTeam } from "@/actions/teams";
+import { startTransition, useActionState, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
-const EvaluationForm = () => {
+type EvaluationFormProps = {
+    teamId: string
+    evaluatorEmail: string
+}
+
+const EvaluationForm = (props: EvaluationFormProps) => {
+
+    const { teamId, evaluatorEmail } = props;
 
     const form = useForm<InsertEvaluationSchema>({
         resolver: zodResolver(InsertEvaluationSchema),
         defaultValues: {
-            teamId: '',
-            evaluatorId: '',
             presentationScore: 0,
             outcomeScore: 0,
             technologyScore: 0
-        }
+        },
+        mode: "onSubmit"
     });
 
-    function onSubmit() {
+    const [result, formAction, isPending] = useActionState(evaluateTeam, null);
+
+    useEffect(() => {
+        if (result && result?.success) {
+            toast({
+                title: "Success",
+                description: "Evaluation submitted successfully"
+            })
+        } else if (result && result?.error) {
+            toast({
+                title: "Error",
+                description: `${result?.error}`,
+                variant: "destructive"
+            })
+        }
+    }, [result])
+
+    function onSubmit(data: InsertEvaluationSchema) {
+
+        const evaluation = {
+            teamId: teamId,
+            evaluatorEmail: evaluatorEmail,
+            ...data
+        }
+
+        startTransition(async()=> {
+            await formAction(JSON.stringify(evaluation));
+        })
+        
 
     }
+
+    if(isPending) return (
+        <div className="flex grow justify-center items-center min-h-[70vh]">
+            <Loader2 className="size-24 animate-spin" />
+        </div>
+    )
 
     return (
         <Dialog>
@@ -64,7 +108,11 @@ const EvaluationForm = () => {
                                     <FormItem className="flex-1">
                                         <FormLabel>Presentation Score</FormLabel>
                                         <FormControl>
-                                            <Input {...field} type="number" />
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                            />
                                         </FormControl>
                                         <FormDescription>
                                         </FormDescription>
@@ -79,7 +127,11 @@ const EvaluationForm = () => {
                                     <FormItem>
                                         <FormLabel>Outcome Score</FormLabel>
                                         <FormControl>
-                                            <Input {...field} type="number" />
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                            />
                                         </FormControl>
                                         <FormDescription>
                                         </FormDescription>
@@ -94,7 +146,11 @@ const EvaluationForm = () => {
                                     <FormItem>
                                         <FormLabel>Technology Score</FormLabel>
                                         <FormControl>
-                                            <Input {...field} type="number" />
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                            />
                                         </FormControl>
                                         <FormDescription>
                                         </FormDescription>
@@ -103,9 +159,9 @@ const EvaluationForm = () => {
                                 )}
                             />
                             <DialogFooter className="sm:justify-start">
-                                <DialogClose asChild>
-                                    <Button type="submit">Submit</Button>
-                                </DialogClose>
+
+                                <Button type="submit">Submit</Button>
+
                             </DialogFooter>
 
                         </form>

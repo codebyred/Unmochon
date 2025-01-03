@@ -17,7 +17,13 @@ import { Separator } from "@/components/ui/separator";
 
 
 type EventItemProps = {
-    event: InsertEventSchema,
+    event: {
+        id: string
+        name: string
+        registrationDeadline: Date
+        projectSubmissionDeadline: Date
+        requirements: string
+    } 
 }
 
 const EventItem = async (props: EventItemProps) => {
@@ -32,18 +38,18 @@ const EventItem = async (props: EventItemProps) => {
     return (
         <Card className="flex flex-col justify-between w-[340px] h-[360px]">
             <CardHeader>
-                <CardTitle className="overflow-hidden h-[100px]">{event.eventName}</CardTitle>
+                <CardTitle className="overflow-hidden h-[100px]">{event.name}</CardTitle>
                 <Separator/>
             </CardHeader>
             <CardContent className="flex h-[160px] overflow-y-hidden">
                 <p className="text-red-500 flex items-center gap-2 text-normal">
-                    <AiOutlineExclamationCircle/>Registration deadline: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}
+                    <AiOutlineExclamationCircle/>Registration deadline: {format(event.registrationDeadline, "PPP hh:mm aa")}
                 </p>             
             </CardContent>
             <CardFooter className="flex flex-col items-center justify-center">
                 <Button asChild>
                     <Link href={
-                        hasPermission(user, "update:events")?`/events/update/${event.id}`
+                        hasPermission(user, "update:events")?`/events/${event.id}/update`
                         :hasPermission(user,"view:events")?`/events/${event.id}`
                         :`/events/${event.id}`
                     }>

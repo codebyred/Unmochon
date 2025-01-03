@@ -38,19 +38,33 @@ const AddEventForm = () => {
     const form = useForm<InsertEventSchema>({
         resolver: zodResolver(InsertEventSchema),
         defaultValues: {
-            eventName: "",
-            lastDateOfRegistration: undefined,
-            lastDateOfProjectSubmission: undefined,
+            name: "",
+            registrationDeadline: undefined,
+            projectSubmissionDeadline: undefined,
             requirements: ""
-        }
+        },
+        mode: "onSubmit"
     })
 
-    const [error, formAction, isPending] = useActionState(createEvent, null)
+    const [result, formAction, isPending] = useActionState(createEvent, null)
 
     useEffect(() => {
-        if (error)
-            toast({ description: error.toString(), variant: "destructive" })
-    }, [error, toast]);
+        if (result && !result.success){
+            toast({ 
+                title: "Error",
+                description: result.error, 
+                variant: "destructive" 
+            })
+        }
+        else if(result && result.success) {
+            toast({ 
+                title: "Success",
+                description: "Event created successfully",  
+            })
+            router.push("/events");
+        }
+            
+    }, [result]);
 
 
     async function onSubmit(values: InsertEventSchema) {
@@ -62,7 +76,6 @@ const AddEventForm = () => {
             }catch(err){
                 toast({description:"Could not create event", variant:"destructive"})
             }
-
         });
 
     }
@@ -88,12 +101,12 @@ const AddEventForm = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify between gap-4">
                     <FormField
                         control={form.control}
-                        name="eventName"
+                        name="name"
                         render={({ field }) => (
                             <FormItem className="flex flex-col grow">
                                 <FormLabel>Event name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} data-cy="eventName" />
+                                    <Input {...field} data-cy="name" />
                                 </FormControl>
                                 <FormDescription>
 
@@ -104,7 +117,7 @@ const AddEventForm = () => {
                     />
                     <FormField
                         control={form.control}
-                        name="lastDateOfRegistration"
+                        name="registrationDeadline"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
                                 <FormLabel>Last date of registration</FormLabel>
@@ -156,7 +169,7 @@ const AddEventForm = () => {
                     />
                     <FormField
                         control={form.control}
-                        name="lastDateOfProjectSubmission"
+                        name="projectSubmissionDeadline"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
                                 <FormLabel>Last date of project submission</FormLabel>
@@ -229,8 +242,6 @@ const AddEventForm = () => {
                 />
             </form>
         </Form>
-
-
     );
 }
 

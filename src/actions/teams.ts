@@ -2,57 +2,61 @@
 
 import { db } from "@/db/drizzle";
 import { eq, and } from "drizzle-orm";
-import { TeamSchema, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
+import { InsertEvaluationSchema, TeamSchema, evaluations, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 
-
-export async function createTeam(previouState: unknown, values: string) {
-
-    const valuesObj = JSON.parse(values);
-
-    const resultOfParsing = TeamSchema.safeParse(valuesObj);
-
-    if (!resultOfParsing.success) {
-        return new Error("Invalid Form Data")
-    }
-
-    const teamId = v4()
+type CreateTeamResult = {
+    success: true
+} | {
+    success: false
+    error: string
+}
+export async function createTeam(previouState: unknown, rawData: string): Promise<CreateTeamResult> {
 
     try {
-        const resultOfTeamsInsert = await db.insert(teams).values({
-            id: teamId,
-            name: resultOfParsing.data.teamName,
-            eventId: resultOfParsing.data.eventId,
-        }).returning({ id: teams.id })
 
-        if (resultOfTeamsInsert.length === 0) {
-            throw new Error("Can not create team");
+        const data = JSON.parse(rawData);
+
+        const teamData = TeamSchema.safeParse(data);
+
+        if (!teamData.success) {
+            throw new Error("Invalid Form Data")
         }
-    } catch (e: unknown) {
-        return (e instanceof Error) ? new Error(`${e.message}`) : new Error(`${e}`)
-    }
 
+        const rows = await db.insert(teams).values({
+            name: teamData.data.teamName,
+            eventId: teamData.data.eventId,
+        }).returning({ id: teams.id });
 
-    try {
-        const resultOfTeamMembersInsert = await db.insert(teamMembers).values(resultOfParsing
+        const teamId = rows.at(0)?.id;
+
+        if (!teamId) {
+            throw new Error("Failed to create team");
+        }
+
+        await db.insert(teamMembers).values(teamData
             .data.members.map((member) => {
                 return { teamId: teamId, memberId: member.id }
             }
-            )).returning({ id: teamMembers.teamId })
+            ))
 
-        if (resultOfTeamMembersInsert.length === 0) {
-            throw new Error("Can not add team members")
+        revalidatePath('/teams');
+
+        return {
+            success: true,
         }
+
     } catch (e: unknown) {
-        return (e instanceof Error) ? new Error(`${e.message}`) : new Error(`${e}`)
+        return {
+            success: false,
+            error: (e instanceof Error) ? e.message : "An unexpected error occurred"
+        }
+
     }
 
-
-    revalidatePath('/teams');
-    redirect('/teams');
 
 }
 
@@ -66,7 +70,7 @@ export async function getAllTeams() {
                 teamName: teams.name,
                 isBanned: teams.banned,
                 isEvaluated: teams.evaluated,
-                eventName: events.eventName,
+                eventName: events.name,
             })
             .from(teams)
             .innerJoin(events, eq(events.id, teams.eventId));
@@ -96,7 +100,7 @@ export async function getMyTeams(email: string): Promise<{ error: string | null,
             .select({
                 teamId: teams.id,
                 teamName: teams.name,
-                eventName: events.eventName,
+                eventName: events.name,
                 memberEmail: students.email,
                 isBanned: teams.banned
             })
@@ -118,7 +122,7 @@ export async function getMyTeams(email: string): Promise<{ error: string | null,
         return { error: null, result }
 
     } catch (error) {
-        if(error instanceof Error){
+        if (error instanceof Error) {
             return { error: error.message, result: null }
         } else {
             console.error("Unexpected error:", error);
@@ -128,21 +132,21 @@ export async function getMyTeams(email: string): Promise<{ error: string | null,
 
 }
 
-export async function deleteTeam(previousState: unknown, teamId: string): Promise<{ error: string | null, result: {id:string} | null }> {
+export async function deleteTeam(previousState: unknown, teamId: string): Promise<{ error: string | null, result: { id: string } | null }> {
 
-    try{
+    try {
 
         const rows = await db.delete(teams).where(eq(teams.id, teamId)).returning({ id: teams.id })
 
         if (rows.length === 0) {
             throw new Error("Could not delete team");
         }
-    
-        revalidatePath('/teams');
-        
-        return {error: null, result: {id:rows.at(0)?.id as string}}
 
-    }catch(error){
+        revalidatePath('/teams');
+
+        return { error: null, result: { id: rows.at(0)?.id as string } }
+
+    } catch (error) {
 
         if (error instanceof Error) {
             return { error: error.message, result: null };
@@ -156,22 +160,68 @@ export async function deleteTeam(previousState: unknown, teamId: string): Promis
 }
 
 
-export async function getTeamInfo(teamId: string) {
-    const rows = await db
-        .select({
-            teamName: teams.name,
-            eventName: events.eventName,
-            memberName: students.name,
-            memberEmail: students.email,
-            memberId: students.id
-        })
-        .from(teamMembers)
-        .innerJoin(teams, eq(teams.id, teamMembers.teamId))
-        .innerJoin(events, eq(events.id, teams.eventId))
-        .innerJoin(students, eq(teamMembers.memberId, students.id))
-        .where(eq(teamMembers.teamId, teamId));
+type GetTeamInfoResult = {
+    success: true,
+    data: {
+        team: {
+            name: string,
+            event: {
+                name: string
+            },
+            members: {
+                name: string,
+                email: string,
+                id: string
+            }[]
+        }
+    }
+} | {
+    success: false,
+    error: string
+}
 
-    return rows
+export async function getTeamInfo(teamId: string): Promise<GetTeamInfoResult> {
+
+    try {
+        const rows = await db
+            .select({
+                teamName: teams.name,
+                eventName: events.name,
+                memberName: students.name,
+                memberEmail: students.email,
+                memberId: students.id
+            })
+            .from(teamMembers)
+            .innerJoin(teams, eq(teams.id, teamMembers.teamId))
+            .innerJoin(events, eq(events.id, teams.eventId))
+            .innerJoin(students, eq(teamMembers.memberId, students.id))
+            .where(eq(teamMembers.teamId, teamId));
+
+        return {
+            success: true,
+            data: {
+                team: {
+                    name: rows.at(0)?.teamName as string,
+                    event: {
+                        name: rows.at(0)?.eventName as string
+                    },
+                    members: rows.map((row) => {
+                        return {
+                            name: row.memberName,
+                            email: row.memberEmail,
+                            id: row.memberId
+                        }
+                    })
+                }
+            }
+        }
+    } catch (error: unknown) {
+        return {
+            success: false,
+            error: (error instanceof Error) ? error.message : "An unexpected error occurred"
+        }
+    }
+
 }
 
 export async function getMyTeamForEvent(eventId: string) {
@@ -228,7 +278,7 @@ export async function banTeam(previousState: unknown, teamId: string): Promise<{
 
 }
 
-export async function unbanTeam(previousState: unknown,teamId: string) {
+export async function unbanTeam(previousState: unknown, teamId: string) {
 
     try {
         const rows = await db.update(teams).set({ banned: false }).where(eq(teams.id, teamId)).returning({ id: teams.id });
@@ -244,5 +294,42 @@ export async function unbanTeam(previousState: unknown,teamId: string) {
             return { error: "An unexpected error occurred", result: null }
         }
     }
-    
+
+}
+
+type EvaluationResult = { success: true; data: { id: string } } | { success: false; error: string };
+export async function evaluateTeam(previousState: unknown, data: string): Promise<EvaluationResult> {
+
+    try {
+        const rawData = JSON.parse(data);
+        console.log(rawData)
+        const { success, data: EvaluationData, error } = InsertEvaluationSchema.safeParse(rawData);
+
+        if (!success) {
+            throw new Error(error.message);
+        }
+
+        await db.transaction(async (tx) => {
+            await tx.update(teams).set({ evaluated: true }).where(eq(teams.id, EvaluationData.teamId!));
+            await tx.insert(evaluations).values({
+                teamId: EvaluationData.teamId!,
+                evaluatorId: EvaluationData.evaluatorId!,
+                presentationScore: EvaluationData.presentationScore,
+                outcomeScore: EvaluationData.outcomeScore,
+                technologyScore: EvaluationData.technologyScore,
+            });
+        });
+
+        return { success: true, data: { id: EvaluationData.teamId! } }
+
+    } catch (err) {
+
+        if (err instanceof Error) {
+            return { success: false, error: err.message }
+        } else {
+            return { success: false, error: "An unexpected error occurred" }
+        }
+
+    }
+
 }

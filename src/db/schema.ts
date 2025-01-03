@@ -4,26 +4,25 @@ import { z } from 'zod';
 
 export const events = pgTable("events",{
     id: uuid("id").primaryKey().defaultRandom(),
-    eventName: varchar("eventName").notNull(),
-    lastDateOfRegistration: timestamp("lastDateOfRegistration").notNull(),
-    lastDateOfProjectSubmission: timestamp("lastDateOfProjectSubmission").notNull(),
+    name: varchar("name").notNull(),
+    registrationDeadline: timestamp("registration_deadline").notNull(),
+    projectSubmissionDeadline: timestamp("project_submission_deadline").notNull(),
     requirements: text("requirements").notNull()
 });
 
-export const actionLogs = pgTable("actionLogs", {
+export const actionLogs = pgTable("action_logs", {
     id: serial("id").primaryKey(),
-    userId: integer("userId").notNull(),
-    actionType: text("actionType").notNull(),
-    entityType: text("entityType").notNull(), 
-    entityId: uuid("entityId").notNull(), 
+    userId: integer("user_id").notNull(),
+    actionType: text("action_type").notNull(),
+    entityType: text("entity_type").notNull(), 
     timestamp: timestamp("timestamp").defaultNow().notNull(),
-    additionalInfo: text("additionalInfo"),
+    additionalInfo: text("additional_info"),
 });
 
 export const teams = pgTable("teams", {
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar("name").notNull(),
-    eventId: uuid("eventId").notNull().references(() => events.id, { onDelete: 'cascade' }),
+    eventId: uuid("event_id").notNull().references(() => events.id, { onDelete: 'cascade' }),
     banned: boolean("banned").default(false).notNull(),
     evaluated: boolean("evaluated").default(false).notNull() 
 });
@@ -34,29 +33,29 @@ export const students = pgTable("students", {
     name: varchar("name").notNull(), 
 },(table) =>{
     return {
-      emailIdx: uniqueIndex("emailIdx").on(table.email)
+      emailIdx: uniqueIndex("student_email_idx").on(table.email)
     };
 });
 
-export const teamMembers = pgTable("teamMembers",{
-    teamId: uuid("teamId").references(()=> teams.id, {onDelete:'cascade'}).notNull(),
-    memberId: varchar("memberId").references(()=> students.id, {onDelete:'cascade'}).notNull(),
+export const teamMembers = pgTable("team_members",{
+    teamId: uuid("team_id").references(()=> teams.id, {onDelete:'cascade'}).notNull(),
+    memberId: varchar("member_id").references(()=> students.id, {onDelete:'cascade'}).notNull(),
 });
 
 export const projects = pgTable("projects",{
     id: uuid("id").primaryKey().defaultRandom(),
-    teamId: uuid("teamId").references(()=> teams.id, {onDelete:'cascade'}).notNull(),
-    eventId: uuid("eventId").references(()=> events.id, {onDelete:'cascade'}).notNull(),
+    teamId: uuid("team_id").references(()=> teams.id, {onDelete:'cascade'}).notNull(),
+    eventId: uuid("event_id").references(()=> events.id, {onDelete:'cascade'}).notNull(),
     name: varchar("name").notNull(),
     description: text("description").notNull(),
-    submittedAt: timestamp("submittedAt").defaultNow().notNull()
+    submittedAt: timestamp("submitted_at").defaultNow().notNull()
 });
 
-export const projectMedia = pgTable("projectMedia",{
+export const projectMedia = pgTable("project_media",{
     id: uuid("id").primaryKey().defaultRandom(),
-    projectId: uuid("projectId").references(()=> projects.id, {onDelete:'cascade'}).notNull(),
-    mediaUrl: varchar("mediaUrl").notNull(),
-    mediaType: varchar("mediaType").notNull()
+    projectId: uuid("project_id").references(()=> projects.id, {onDelete:'cascade'}).notNull(),
+    mediaUrl: varchar("media_url").notNull(),
+    mediaType: varchar("media_type").notNull()
 })
 
 export const designationEnum = pgEnum("designation",["Assistant Professor", "Associate Professor", "Professor", "lecuturer"]);
@@ -67,8 +66,11 @@ export const facutly = pgTable("faculty",{
     name: varchar("name").notNull(),
     department: varchar("department").notNull(),
     designation: designationEnum().notNull()
+},(table) =>{
+    return {
+      emailIdx: uniqueIndex("faculty_email_idx").on(table.email)
+    };
 })
-
 
 export const evaluations = pgTable("evaluations", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -98,6 +100,8 @@ export const InsertProjectSchema = createInsertSchema(projects,{
 });
 
 export const InsertEvaluationSchema = createInsertSchema(evaluations, {
+    teamId: (schema) => schema.teamId.optional(),
+    evaluatorId: (schema) => schema.evaluatorId.optional(),
     presentationScore: (schema) => schema.presentationScore.min(0).max(10),
     outcomeScore: (schema) => schema.outcomeScore.min(0).max(10),
     technologyScore: (schema) => schema.technologyScore.min(0).max(10)
@@ -108,8 +112,6 @@ export const InsertEventSchema = createInsertSchema(events);
 export const InsertActionLogSchema = createInsertSchema(actionLogs);
 
 export const InsertProjectMediaSchema = createInsertSchema(projectMedia)
-
-
 
 export type InsertEventSchema = z.infer<typeof InsertEventSchema>
 

@@ -1,11 +1,9 @@
-import { getEvent, getEvents } from "@/actions/events";
-import RefreshButton from "@/components/button/RefreshButton";
+import { getEvent } from "@/actions/events";
 import EventRegistrationForm from "@/components/form/EventRegistrationForm";
-import { currentUser } from "@clerk/nextjs/server";
 import { compareAsc } from "date-fns";
 
 
-const EventRegistration = async({
+const EventRegistration = async ({
     params,
 }: {
     params: Promise<{ id: string }>
@@ -13,62 +11,42 @@ const EventRegistration = async({
 
     const eventId = (await params).id;
 
-    const {error, result} = await isRegistrationClosed(eventId);
+    const result = await getEvent(eventId);
 
-    if(error) return (
-        <div className="grow flex flex-col shadow-custom rounded-lg">
-            <div className="grow flex flex-col items-center">
-                {error}
-                <RefreshButton/>
-            </div>
+    if (!result.success) return (
+        <div className="p-4 grow shadow-custom rounded-lg">
+            {result.error}
         </div>
     )
 
-    if(result) 
+    const { event } = result.data;
+
+
+    if(isRegistrationClosed(event.registrationDeadline))
         return (
             <div className="p-4 grow shadow-custom rounded-lg">
-                <EventRegistrationForm/>
-            </div>
-
-        )
-    else
-        return (
-            <div>
                 Event registration is closed
             </div>
         )
+        
+    return (
+        <div className="p-4 grow shadow-custom rounded-lg">
+            <EventRegistrationForm 
+                eventId={ event .id }
+                eventName={ event .name }
+            />
+        </div>
+
+    )
 }
 
 export default EventRegistration;
 
 
-async function isRegistrationClosed(eventId: string) {
+function isRegistrationClosed(registrationDeadline: Date) {
 
-    try{
-      const {error, result} = await getEvent(eventId);
+    const currentDate = new Date();
 
-      if(error || result.length === 0 ) {
-        throw new Error("Internal server error");
-      }
-  
-      const currentDateIsAfterLastDateOfRegistration = 1;
-      const currentDateIsBeforeLastDateOfRegistration = -1;
-      const currentDateIslastDateOfRegistration = 0;
-    
-      const currentDate = new Date(2024, 11, 13);
-      const comparedValue = compareAsc(currentDate, result.at(0)?.lastDateOfRegistration as Date)
-    
-      if(comparedValue === currentDateIsAfterLastDateOfRegistration){
-        return {error: null, result: true}
-      }
-      return {error: null, result: false}
-
-    }catch(error) {
-        if(error instanceof Error)
-            return {error: error.message, result: false}
-        else
-            return {error: "An unexpected error occured", result: false}
-    }
-  
-  
-  }
+    // Compare the current date with the registration deadline
+    return compareAsc(currentDate, registrationDeadline) > 0;
+}

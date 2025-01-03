@@ -87,7 +87,7 @@ export async function getProjectsByTeamId(teamId: string): Promise<{error: null 
         const project = await db.select({
             projectId: projects.id,
             eventId: projects.eventId,
-            eventName: events.eventName,
+            eventName: events.name,
             projectName: projects.name,
             projectDescription: projects.description,
             projectMediaUrl: projectMedia.mediaUrl
@@ -116,7 +116,7 @@ export async function getProjectsByProjectId(projectId: string) {
         const project = await db.select({
             projectId: projects.id,
             eventId: projects.eventId,
-            eventName: events.eventName,
+            eventName: events.name,
             projectName: projects.name,
             projectDescription: projects.description,
             projectMediaUrl: projectMedia.mediaUrl

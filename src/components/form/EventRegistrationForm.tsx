@@ -23,18 +23,24 @@ import { MagicBackButton } from "../button/MagicBackButton"
 import { FaPlus } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
 import { Separator } from "@/components/ui/separator"
+import BackButton from "../button/BackButton"
 
-const EventRegistrationForm = () => {
+type EventRegistrationFormProps = {
+    eventId: string
+    eventName: string
+}
+
+const EventRegistrationForm = (props: EventRegistrationFormProps) => {
 
     const router = useRouter()
     const searchParams = useSearchParams();
-    const eventId = searchParams.get('eventId');
-    const eventName = searchParams.get('eventName');
+
+    const {eventId, eventName} = props;
 
     const form = useForm<TeamSchema>({
         resolver: zodResolver(TeamSchema),
         defaultValues: {
-            eventId: eventId as string,
+            eventId: eventId,
             teamName: "",
             members: [{ name: '', id: '', email: '' }]
         }
@@ -42,23 +48,33 @@ const EventRegistrationForm = () => {
 
     const { fields, append, remove } = useFieldArray<TeamSchema>({ name: "members", control: form.control })
 
-    const [error, formAction, isPending] = useActionState(createTeam, null)
+    const [result, formAction, isPending] = useActionState(createTeam, null)
 
     useEffect(() => {
-        if (error)
-            toast({ description: error.toString(), variant: "destructive" })
-    }, [error]);
+        if (result && !result.success){
+            toast({ 
+                title: "Error",
+                description: result.error,
+                variant: "destructive" 
+            })
+        }
+        else if(result && result.success) {
+            toast({ 
+                title: "Success",
+                description: "Team created successfully",
+            })
+            router.push(`/teams`);
+        }
+            
+    }, [result]);
 
     async function onSubmit(values: TeamSchema) {
 
+        console.log(values)
 
         startTransition(async () =>{
-            try{
-                await formAction(JSON.stringify(values))
-                toast({description: "Team registration completed"})
-            }catch(err){
-                toast({description: "Could not register", variant:"destructive"})
-            }
+            
+            await formAction(JSON.stringify(values))
 
         });
 
@@ -70,7 +86,7 @@ const EventRegistrationForm = () => {
             <form className="" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="mb-4">
                     <div className="flex justify-between items-center mb-4">   
-                        <MagicBackButton type="button"/>
+                        <BackButton/>
                         <Button
                             type="submit"
                             disabled={isPending}

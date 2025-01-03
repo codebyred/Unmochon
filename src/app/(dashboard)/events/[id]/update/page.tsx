@@ -1,6 +1,8 @@
 import { getEvent } from "@/actions/events";
 import UpdateEventForm from "@/components/form/UpdateEventForm";
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
 
 
 const EventPage = async ({
@@ -11,22 +13,25 @@ const EventPage = async ({
 
     const id = (await params).id
 
-    const [error, result] = await getEvent(id);
+    const result = await getEvent(id);
     const user = await currentUser();
 
     if (!user) return (
-        <div></div>
+        redirect('/signin')
     )
 
-    if (error || result === null) return (
-        <div>No event found</div>
+    if (!result.success) return (
+        <div className="grow p-4 shadow-custom rounded-lg">
+            No event found
+        </div>
     )
 
+    const { data } = result;
     return (
         <div className="grow p-4 shadow-custom rounded-lg" data-cy="addEvent-page">
 
             <UpdateEventForm
-                event={result[0]}
+                event={data.event}
             />
         
         </div>

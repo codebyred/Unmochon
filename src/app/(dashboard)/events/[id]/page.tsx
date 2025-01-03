@@ -18,15 +18,13 @@ const ViewEvent = async ({
 
     const eventId = (await params).id
 
-    const {error, result} = await getEvent(eventId);
+    const result = await getEvent(eventId);
 
-    if (error !== null || result.length === 0) return (
+    if (!result.success) return (
         <div>No data found related to event</div>
     )
 
-    const event = result.at(0) as InsertEventSchema;
-
-    //const {result: project} = await getProject(eventId as string);
+    const { event }= result.data;
 
     return (
         <div className="shadow-custom p-4 rounded-lg grow">
@@ -47,15 +45,15 @@ const ViewEvent = async ({
 
             </div>
             <h1 className="text-4xl">
-                {event.eventName}
+                {event.name}
             </h1>
             <Separator className="mt-4 mb-4" />
             <div>
                 <h2 className="flex items-center gap-2 text-xl font-thin">
                     <FaCalendarTimes />Deadlines
                 </h2>
-                <p className="text-red-600">Registration deadline: {format(event.lastDateOfRegistration, "PPP hh:mm aa")}</p>
-                <p className="text-red-600">Project submission deadline: {format(event.lastDateOfProjectSubmission, "PPP hh:mm aa")}</p>
+                <p className="text-red-600">Registration deadline: {format(event.registrationDeadline, "PPP hh:mm aa")}</p>
+                <p className="text-red-600">Project submission deadline: {format(event.projectSubmissionDeadline, "PPP hh:mm aa")}</p>
             </div>
             <Separator className="mt-4 mb-4" />
             <h2 className="text-xl font-thin flex items-center gap-2">

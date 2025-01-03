@@ -34,50 +34,64 @@ import { deleteEvent, updateEvent } from "@/actions/events"
 import { startTransition, useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { TimePicker } from "@/components/timepicker/Timepicker"
-import { toast, useToast } from "@/hooks/use-toast"
+import { toast } from "@/hooks/use-toast"
 import { MagicBackButton } from "@/components/button/MagicBackButton"
 
 type UpdateEventFormProps = {
-    event: InsertEventSchema
+    event: {
+        id: string
+        name: string
+        registrationDeadline: Date
+        projectSubmissionDeadline: Date
+        requirements: string
+    }
 }
 
 const UpdateEventForm = (props: UpdateEventFormProps) => {
 
     const { event } = props;
     const router = useRouter();
-    const { toast } = useToast();
 
     const form = useForm<InsertEventSchema>({
         resolver: zodResolver(InsertEventSchema),
         defaultValues:
         {
             id: event.id,
-            eventName: event.eventName,
-            lastDateOfRegistration: event.lastDateOfRegistration,
-            lastDateOfProjectSubmission: event.lastDateOfProjectSubmission,
+            name: event.name,
+            registrationDeadline: event.registrationDeadline,
+            projectSubmissionDeadline: event.projectSubmissionDeadline,
             requirements: event.requirements
         }
 
     });
 
 
-    const [error, formAction, isPending] = useActionState(updateEvent, null);
+    const [result, formAction, isPending] = useActionState(updateEvent, null);
 
     useEffect(() => {
-        if (error)
-            toast({ description: error.toString(), variant: "destructive" })
-    }, [error, toast]);
+        if (result && !result.success){
+            toast({
+                title: "Error",
+                description: result.error, 
+                variant: "destructive" 
+            })
+        }
+        else if( result && result.success) {
+            toast({
+                title: "Success",
+                description: "Event updated successfully"
+            })
+            router.push(`/events`)
+        }
+            
+    }, [result]);
 
 
     async function onSubmit(values: InsertEventSchema) {
 
         startTransition(async () => {
-            try {
-                await formAction(JSON.stringify(values))
-                toast({ description: "Event updated successfully" })
-            } catch (err) {
-                toast({ description: "Could not update event", variant: "destructive" })
-            }
+            
+            await formAction(JSON.stringify(values))
 
         });
 
@@ -109,12 +123,12 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify between gap-4">
                     <FormField
                         control={form.control}
-                        name="eventName"
+                        name="name"
                         render={({ field }) => (
                             <FormItem className="flex flex-col grow">
                                 <FormLabel>Event name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} data-cy="eventName" />
+                                    <Input {...field} data-cy="name" />
                                 </FormControl>
                                 <FormDescription>
 
@@ -125,7 +139,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                     />
                     <FormField
                         control={form.control}
-                        name="lastDateOfRegistration"
+                        name="registrationDeadline"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
                                 <FormLabel>Last date for registration</FormLabel>
@@ -177,7 +191,7 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
                     />
                     <FormField
                         control={form.control}
-                        name="lastDateOfProjectSubmission"
+                        name="projectSubmissionDeadline"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
                                 <FormLabel>Last date of project submission</FormLabel>

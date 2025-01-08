@@ -29,15 +29,14 @@ const Teams = async ()=>{
     return (
         <div className="p-4 grow shadow-custom rounded-lg">
             {
-                isEventOrganizer(user) && <TeamsTabForOrganizer/>
-            }
-            {
-                isFaculty(user) && <TeamsTabForFaculty/>
-            }
-            {
-                isStudent(user) && <TeamsTabForStudent studentEmail={user.emailAddresses.at(0)?.emailAddress as string}/>
-            }
-            
+                isEventOrganizer(user)?
+                    <TeamsTabForOrganizer/>
+                    :isFaculty(user)?
+                        <TeamsTabForFaculty/>
+                        :isStudent(user)?
+                            <TeamsTabForStudent studentEmail={user.emailAddresses.at(0)?.emailAddress as string}/>
+                            :<div></div>
+            }          
         </div>
     )
 

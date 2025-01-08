@@ -31,12 +31,12 @@ import { Loader2 } from "lucide-react";
 
 type EvaluationFormProps = {
     teamId: string
-    evaluatorEmail: string
+    evaluatorId: string
 }
 
 const EvaluationForm = (props: EvaluationFormProps) => {
 
-    const { teamId, evaluatorEmail } = props;
+    const { teamId, evaluatorId } = props;
 
     const form = useForm<InsertEvaluationSchema>({
         resolver: zodResolver(InsertEvaluationSchema),
@@ -45,7 +45,6 @@ const EvaluationForm = (props: EvaluationFormProps) => {
             outcomeScore: 0,
             technologyScore: 0
         },
-        mode: "onSubmit"
     });
 
     const [result, formAction, isPending] = useActionState(evaluateTeam, null);
@@ -69,7 +68,7 @@ const EvaluationForm = (props: EvaluationFormProps) => {
 
         const evaluation = {
             teamId: teamId,
-            evaluatorEmail: evaluatorEmail,
+            evaluatorId: evaluatorId,
             ...data
         }
 
@@ -111,7 +110,6 @@ const EvaluationForm = (props: EvaluationFormProps) => {
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -130,7 +128,6 @@ const EvaluationForm = (props: EvaluationFormProps) => {
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -149,7 +146,6 @@ const EvaluationForm = (props: EvaluationFormProps) => {
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                             />
                                         </FormControl>
                                         <FormDescription>

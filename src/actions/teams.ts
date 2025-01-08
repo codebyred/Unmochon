@@ -7,6 +7,9 @@ import { revalidatePath } from "next/cache";
 import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
+import { neon } from '@neondatabase/serverless';
+import { v4 as uuidv4 } from 'uuid';
+
 
 type CreateTeamResult = {
     success: true
@@ -301,6 +304,9 @@ type EvaluationResult = { success: true; data: { id: string } } | { success: fal
 export async function evaluateTeam(previousState: unknown, data: string): Promise<EvaluationResult> {
 
     try {
+
+        const sql = neon(process.env.DATABASE_URL!);
+
         const rawData = JSON.parse(data);
         console.log(rawData)
         const { success, data: EvaluationData, error } = InsertEvaluationSchema.safeParse(rawData);
@@ -309,16 +315,23 @@ export async function evaluateTeam(previousState: unknown, data: string): Promis
             throw new Error(error.message);
         }
 
-        await db.transaction(async (tx) => {
-            await tx.update(teams).set({ evaluated: true }).where(eq(teams.id, EvaluationData.teamId!));
-            await tx.insert(evaluations).values({
-                teamId: EvaluationData.teamId!,
-                evaluatorId: EvaluationData.evaluatorId!,
-                presentationScore: EvaluationData.presentationScore,
-                outcomeScore: EvaluationData.outcomeScore,
-                technologyScore: EvaluationData.technologyScore,
-            });
-        });
+        if (!EvaluationData.teamId) {
+            throw new Error("Team ID is required");
+        }
+
+        if(!EvaluationData.evaluatorId) {
+            throw new Error("Evaluator Id is required")
+        }
+
+        const evaluationsRows = await db.insert(evaluations).values({
+            teamId: EvaluationData.teamId,
+            evaluatorId: EvaluationData.evaluatorId,
+            presentationScore: EvaluationData.presentationScore,
+            outcomeScore: EvaluationData.outcomeScore,
+            technologyScore: EvaluationData.technologyScore,
+        }).returning({ id: evaluations.id, teamId: evaluations.teamId });
+
+        await db.update(teams).set({ evaluated: true }).where(eq(teams.id, evaluationsRows.at(0)?.teamId as string));
 
         return { success: true, data: { id: EvaluationData.teamId! } }
 

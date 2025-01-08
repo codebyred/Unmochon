@@ -1,3 +1,5 @@
+"use client"
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar, CalendarCurrentDate, CalendarDayView, CalendarMonthView, CalendarNextTrigger, CalendarPrevTrigger, CalendarTodayTrigger, CalendarViewTrigger, CalendarWeekView, CalendarYearView } from "../calendar/full-calendar";
 
@@ -38,11 +40,6 @@ const StudentDashboard = () => {
                         >
                             Year
                         </CalendarViewTrigger>
-
-                        <span className="flex-1" />
-
-                        <CalendarCurrentDate />
-
                         <CalendarPrevTrigger>
                             <ChevronLeft size={20} />
                             <span className="sr-only">Previous</span>

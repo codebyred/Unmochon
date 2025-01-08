@@ -102,9 +102,9 @@ export const InsertProjectSchema = createInsertSchema(projects,{
 export const InsertEvaluationSchema = createInsertSchema(evaluations, {
     teamId: (schema) => schema.teamId.optional(),
     evaluatorId: (schema) => schema.evaluatorId.optional(),
-    presentationScore: (schema) => schema.presentationScore.min(0).max(10),
-    outcomeScore: (schema) => schema.outcomeScore.min(0).max(10),
-    technologyScore: (schema) => schema.technologyScore.min(0).max(10)
+    presentationScore: z.coerce.number().min(0).max(10),
+    outcomeScore: z.coerce.number().min(0).max(10),
+    technologyScore: z.coerce.number().min(0).max(10)
 });
 
 export const InsertEventSchema = createInsertSchema(events);

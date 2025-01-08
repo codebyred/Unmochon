@@ -12,6 +12,8 @@ import { RiTeamFill } from "react-icons/ri";
 import { FaProjectDiagram } from "react-icons/fa";
 import { IoMdInformationCircle } from "react-icons/io";
 import { FaImages } from "react-icons/fa";
+import { getFacultyByEmail } from "@/actions/faculty";
+import Evaluation from "@/components/Evaluation";
 
 const TeamView = async ({
     params,
@@ -22,6 +24,7 @@ const TeamView = async ({
     const teamId = (await params).id;
     console.log(teamId)
     const getTeamInfoResult = await getTeamInfo(teamId);
+    
 
     if(!getTeamInfoResult.success) return (
         <div>
@@ -37,7 +40,6 @@ const TeamView = async ({
 
     if (error) return (
         <div>
-            lala
             {error}
         </div>
     )
@@ -45,15 +47,10 @@ const TeamView = async ({
     return (
         <div className="grow shadow-custom p-4 rounded-lg text-xl">
             <div className="flex justify-between mb-4">
-                <BackButton />
-                {
-                    isFaculty(user)
-                    &&
-                    <EvaluationForm
-                        teamId={teamId}
-                        evaluatorEmail={user.emailAddresses.at(0)?.emailAddress as string}
-                    />
-                }
+                <BackButton /> 
+                <Evaluation
+                    teamId={teamId}
+                />           
             </div>
             <div className="mb-4 shadow-custom rounded-lg p-4">
                 <h1 className="text-2xl font-bold flex gap-2 items-center">

@@ -28,6 +28,7 @@ import { evaluateTeam } from "@/actions/teams";
 import { startTransition, useActionState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { HiDotsHorizontal } from "react-icons/hi";
 
 type EvaluationFormProps = {
     teamId: string
@@ -76,14 +77,7 @@ const EvaluationForm = (props: EvaluationFormProps) => {
             await formAction(JSON.stringify(evaluation));
         })
         
-
     }
-
-    if(isPending) return (
-        <div className="flex grow justify-center items-center min-h-[70vh]">
-            <Loader2 className="size-24 animate-spin" />
-        </div>
-    )
 
     return (
         <Dialog>
@@ -155,11 +149,10 @@ const EvaluationForm = (props: EvaluationFormProps) => {
                                 )}
                             />
                             <DialogFooter className="sm:justify-start">
-
-                                <Button type="submit">Submit</Button>
-
+                                <Button type="submit">
+                                   {isPending? <span><Loader2/> Evaluating</span> :"Submit"} 
+                                </Button>
                             </DialogFooter>
-
                         </form>
                     </Form>
                 </div>

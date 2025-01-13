@@ -42,19 +42,19 @@ const ProjectForm = (props: ProjectFormProps) => {
     const [result, formAction, isPending] = useActionState(createProject, null)
 
     useEffect(() => {
-        if (result?.error)
+        if (result && !result?.success)
             toast({ 
                 title: "Error",
                 description: `${result.error}`, 
                 variant: "destructive" 
             })
         
-        else if(result?.projectId) {
+        else if(result && result?.success) {
             toast({ 
                 title: "Success",
                 description: "Project submitted successfully" 
             })
-            router.push(`/projects/submission/step-two?projectId=${result?.projectId}`)
+            router.push(`/projects/submission`)
         } 
 
     }, [result]);

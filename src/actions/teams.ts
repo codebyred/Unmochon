@@ -4,11 +4,9 @@ import { db } from "@/db/drizzle";
 import { eq, and } from "drizzle-orm";
 import { InsertEvaluationSchema, TeamSchema, evaluations, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
-import { v4 } from 'uuid';
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { neon } from '@neondatabase/serverless';
-import { v4 as uuidv4 } from 'uuid';
 
 
 type CreateTeamResult = {
@@ -29,12 +27,12 @@ export async function createTeam(previouState: unknown, rawData: string): Promis
             throw new Error("Invalid Form Data")
         }
 
-        const rows = await db.insert(teams).values({
+        const teamInfoRows = await db.insert(teams).values({
             name: teamData.data.teamName,
             eventId: teamData.data.eventId,
         }).returning({ id: teams.id });
 
-        const teamId = rows.at(0)?.id;
+        const teamId = teamInfoRows.at(0)?.id;
 
         if (!teamId) {
             throw new Error("Failed to create team");
@@ -67,7 +65,7 @@ type Result = { teamId: string, teamName: string, eventName: string }
 export async function getAllTeams() {
 
     try {
-        const rows = await db
+        const teamInfoRows = await db
             .select({
                 teamId: teams.id,
                 teamName: teams.name,
@@ -78,11 +76,11 @@ export async function getAllTeams() {
             .from(teams)
             .innerJoin(events, eq(events.id, teams.eventId));
 
-        if (rows.length === 0) {
+        if (teamInfoRows.length === 0) {
             throw new Error("No teams available")
         }
 
-        return { error: null, result: rows }
+        return { error: null, result: teamInfoRows }
 
     } catch (error) {
         if (error instanceof Error) {
@@ -99,7 +97,7 @@ export async function getMyTeams(email: string): Promise<{ error: string | null,
 
     try {
 
-        const rows = await db
+        const teamInfoRows = await db
             .select({
                 teamId: teams.id,
                 teamName: teams.name,
@@ -112,7 +110,7 @@ export async function getMyTeams(email: string): Promise<{ error: string | null,
             .innerJoin(events, eq(teams.eventId, events.id))
             .innerJoin(students, eq(students.id, teamMembers.memberId));
 
-        const result = rows.filter((row) => {
+        const result = teamInfoRows.filter((row) => {
             return row.memberEmail === email
         }).map((row) => {
             return { teamId: row.teamId, teamName: row.teamName, eventName: row.eventName, isBanned: row.isBanned }
@@ -139,15 +137,15 @@ export async function deleteTeam(previousState: unknown, teamId: string): Promis
 
     try {
 
-        const rows = await db.delete(teams).where(eq(teams.id, teamId)).returning({ id: teams.id })
+        const teamInfoRows = await db.delete(teams).where(eq(teams.id, teamId)).returning({ id: teams.id })
 
-        if (rows.length === 0) {
+        if (teamInfoRows.length === 0) {
             throw new Error("Could not delete team");
         }
 
         revalidatePath('/teams');
 
-        return { error: null, result: { id: rows.at(0)?.id as string } }
+        return { error: null, result: { id: teamInfoRows.at(0)?.id as string } }
 
     } catch (error) {
 
@@ -163,6 +161,18 @@ export async function deleteTeam(previousState: unknown, teamId: string): Promis
 }
 
 
+type TeamEvaluation = {
+    status: true
+    grade: number
+} | {
+    status: false
+}
+
+type TeamProjectStatus = {
+    description: boolean
+    media: boolean
+}
+
 type GetTeamInfoResult = {
     success: true,
     data: {
@@ -175,7 +185,11 @@ type GetTeamInfoResult = {
                 name: string,
                 email: string,
                 id: string
-            }[]
+            }[],
+            evaluation: TeamEvaluation
+            project: {
+                status: TeamProjectStatus
+            }
         }
     }
 } | {
@@ -186,48 +200,93 @@ type GetTeamInfoResult = {
 export async function getTeamInfo(teamId: string): Promise<GetTeamInfoResult> {
 
     try {
-        const rows = await db
+        const teamInfoRows = await db
             .select({
                 teamName: teams.name,
                 eventName: events.name,
                 memberName: students.name,
                 memberEmail: students.email,
-                memberId: students.id
+                memberId: students.id,
+                evaluationStatus: teams.evaluated,
+                hasSubmittedDescription: teams.projectDescriptionSubmitted,
+                hasSubmittedMedia: teams.projectMediaSubmitted
             })
             .from(teamMembers)
             .innerJoin(teams, eq(teams.id, teamMembers.teamId))
             .innerJoin(events, eq(events.id, teams.eventId))
             .innerJoin(students, eq(teamMembers.memberId, students.id))
             .where(eq(teamMembers.teamId, teamId));
+        
+        if(teamInfoRows.length === 0) {
+            throw new Error(`No team found with team id ${teamId}`)
+        }
 
-        return {
+        const evaluationRows = await db.select().from(evaluations).where(eq(evaluations.teamId, teamId))
+
+        return  {
             success: true,
             data: {
                 team: {
-                    name: rows.at(0)?.teamName as string,
+                    name: teamInfoRows.at(0)?.teamName as string,
                     event: {
-                        name: rows.at(0)?.eventName as string
+                        name: teamInfoRows.at(0)?.eventName as string
                     },
-                    members: rows.map((row) => {
+                    members: teamInfoRows.map((row) => {
                         return {
                             name: row.memberName,
                             email: row.memberEmail,
                             id: row.memberId
                         }
-                    })
+                    }),
+                    evaluation: teamInfoRows.at(0)?.evaluationStatus?{
+                        status: true,
+                        grade: (
+                            (evaluationRows.at(0)?.presentationScore as number)
+                            + (evaluationRows.at(0)?.outcomeScore as number)
+                            + (evaluationRows.at(0)?.technologyScore as number)
+                        )
+                    }: {
+                        status: false
+                    },
+                    project: {
+                        status: {
+                            description: teamInfoRows.at(0)?.hasSubmittedDescription as boolean,
+                            media: teamInfoRows.at(0)?.hasSubmittedMedia as boolean
+                        }
+                    }
                 }
             }
         }
+
     } catch (error: unknown) {
+
         return {
             success: false,
             error: (error instanceof Error) ? error.message : "An unexpected error occurred"
         }
+
     }
 
 }
 
-export async function getMyTeamForEvent(eventId: string) {
+type GetMyTeamForEventResult = 
+{
+    success: false;
+    error: string;
+}
+| {
+    success: true;
+    data: {
+        team: {
+            id: string
+            project: {
+                status: TeamProjectStatus
+            }
+        }
+    };
+};
+
+export async function getMyTeamForEvent(eventId: string): Promise<GetMyTeamForEventResult> {
 
     try {
 
@@ -239,9 +298,12 @@ export async function getMyTeamForEvent(eventId: string) {
 
         const email = user.emailAddresses.at(0)?.emailAddress as string;
 
-        const rows = await db
+        const teamInfoRows = await db
             .select({
                 teamId: teamMembers.teamId,
+                teamName: teams.name,
+                hasSubmittedDescription: teams.projectDescriptionSubmitted,
+                hasSubmittedMedia: teams.projectMediaSubmitted
             })
             .from(teamMembers)
             .innerJoin(students, eq(students.id, teamMembers.memberId))
@@ -251,13 +313,23 @@ export async function getMyTeamForEvent(eventId: string) {
 
 
         return {
-            error: null,
-            result: rows
+            success: true,
+            data: {
+                team: {
+                    id: teamInfoRows.at(0)?.teamId as string,
+                    project: {
+                        status: {
+                            description: teamInfoRows.at(0)?.hasSubmittedDescription as boolean,
+                            media: teamInfoRows.at(0)?.hasSubmittedMedia as boolean
+                        }
+                    }
+                }   
+            }
         }
     } catch (err) {
         return {
+            success: false,
             error: "Student team information not found",
-            result: []
         }
     }
 
@@ -265,12 +337,12 @@ export async function getMyTeamForEvent(eventId: string) {
 
 export async function banTeam(previousState: unknown, teamId: string): Promise<{ error: string | null, result: { id: string } | null }> {
     try {
-        const rows = await db.update(teams).set({ banned: true }).where(eq(teams.id, teamId)).returning({ id: teams.id });
-        if (rows.length === 0) {
+        const teamInfoRows = await db.update(teams).set({ banned: true }).where(eq(teams.id, teamId)).returning({ id: teams.id });
+        if (teamInfoRows.length === 0) {
             throw new Error("Could not unban team");
         }
         revalidatePath('/teams');
-        return { error: null, result: { id: rows.at(0)?.id as string } }
+        return { error: null, result: { id: teamInfoRows.at(0)?.id as string } }
     } catch (err) {
         if (err instanceof Error) {
             return { error: err.message, result: null }
@@ -284,12 +356,12 @@ export async function banTeam(previousState: unknown, teamId: string): Promise<{
 export async function unbanTeam(previousState: unknown, teamId: string) {
 
     try {
-        const rows = await db.update(teams).set({ banned: false }).where(eq(teams.id, teamId)).returning({ id: teams.id });
-        if (rows.length === 0) {
+        const teamInfoRows = await db.update(teams).set({ banned: false }).where(eq(teams.id, teamId)).returning({ id: teams.id });
+        if (teamInfoRows.length === 0) {
             throw new Error("Could not unban team");
         }
         revalidatePath('/teams');
-        return { error: null, result: rows }
+        return { error: null, result: teamInfoRows }
     } catch (err) {
         if (err instanceof Error) {
             return { error: err.message, result: null }
@@ -323,17 +395,30 @@ export async function evaluateTeam(previousState: unknown, data: string): Promis
             throw new Error("Evaluator Id is required")
         }
 
-        const evaluationsRows = await db.insert(evaluations).values({
-            teamId: EvaluationData.teamId,
-            evaluatorId: EvaluationData.evaluatorId,
-            presentationScore: EvaluationData.presentationScore,
-            outcomeScore: EvaluationData.outcomeScore,
-            technologyScore: EvaluationData.technologyScore,
-        }).returning({ id: evaluations.id, teamId: evaluations.teamId });
 
-        await db.update(teams).set({ evaluated: true }).where(eq(teams.id, evaluationsRows.at(0)?.teamId as string));
+        await db.transaction(async (tx)=>{
 
-        return { success: true, data: { id: EvaluationData.teamId! } }
+            if (!EvaluationData.teamId) {
+                throw new Error("Team ID is required");
+            }
+    
+            if(!EvaluationData.evaluatorId) {
+                throw new Error("Evaluator Id is required")
+            }
+
+            await tx.insert(evaluations).values({
+                teamId: EvaluationData.teamId,
+                evaluatorId: EvaluationData.evaluatorId,
+                presentationScore: EvaluationData.presentationScore,
+                outcomeScore: EvaluationData.outcomeScore,
+                technologyScore: EvaluationData.technologyScore,
+            });
+
+            await tx.update(teams).set({ evaluated: true }).where(eq(teams.id, EvaluationData.teamId));
+
+        })
+
+        return { success: true, data: { id: EvaluationData.teamId } }
 
     } catch (err) {
 

@@ -1,24 +1,13 @@
-import { getTeamId } from "@/actions/teams";
 import Fileupload from "@/components/input/Fileupload";
 import { currentUser } from "@clerk/nextjs/server";
 
-const ProjectSubmission = async({
-    searchParams
-}: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-})=> {
-
-    const projectId = (await searchParams)?.projectId;
-    if(!projectId) return <div>You have not submitted project name and description</div>
-
-    const user = await currentUser();
-
-    if(!user) return <div>Please sign in</div>
-
+const ProjectSubmission = async()=> {
 
     return (
         <div className="grow p-4 shadow-custom rounded-lg">
-            <Fileupload/>
+            <Fileupload
+            
+            />
         </div>
     )
 }

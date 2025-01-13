@@ -1,18 +1,15 @@
-import { getProjectsByTeamId } from "@/actions/projects";
+import { getProjectByTeamId } from "@/actions/projects";
 import { getTeamInfo } from "@/actions/teams";
 import MemberTable from "@/components/table/MemberTable";
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
 import BackButton from "@/components/button/BackButton";
-import EvaluationForm from "@/components/form/EvaluationForm";
-import { isFaculty } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { RiTeamFill } from "react-icons/ri";
 import { FaProjectDiagram } from "react-icons/fa";
 import { IoMdInformationCircle } from "react-icons/io";
 import { FaImages } from "react-icons/fa";
-import { getFacultyByEmail } from "@/actions/faculty";
 import Evaluation from "@/components/Evaluation";
 
 const TeamView = async ({
@@ -22,9 +19,8 @@ const TeamView = async ({
 }) => {
 
     const teamId = (await params).id;
-    console.log(teamId)
-    const getTeamInfoResult = await getTeamInfo(teamId);
-    
+
+    const getTeamInfoResult = await getTeamInfo(teamId);  
 
     if(!getTeamInfoResult.success) return (
         <div>
@@ -32,25 +28,27 @@ const TeamView = async ({
         </div>
     
     )
+
     const { team } = getTeamInfoResult.data;
-    const { error, result } = await getProjectsByTeamId(teamId);
-    const user = await currentUser();
 
-    if (!user) redirect('/sigin');
+    const projectResult = await getProjectByTeamId(teamId);
 
-    if (error) return (
-        <div>
-            {error}
-        </div>
-    )
+    console.log(projectResult)
 
     return (
         <div className="grow shadow-custom p-4 rounded-lg text-xl">
             <div className="flex justify-between mb-4">
                 <BackButton /> 
-                <Evaluation
-                    teamId={teamId}
-                />           
+                {
+                    team.evaluation.status?
+                    <span className="border border-orange-400 rounded-lg flex items-center justify-center p-2">
+                        <label>Score: </label>
+                        {team.evaluation.grade}/30
+                    </span>
+                    :<Evaluation
+                        teamId={teamId}
+                    />   
+                }
             </div>
             <div className="mb-4 shadow-custom rounded-lg p-4">
                 <h1 className="text-2xl font-bold flex gap-2 items-center">
@@ -96,7 +94,7 @@ const TeamView = async ({
                 </h1>
                 <Separator className="my-4" />
                 {
-                    result.length === 0 ?
+                    !projectResult.success ?
                         <div className="grow flex items-center justify-center">
                             <span className="text-normal">
                                 No project submitted
@@ -106,12 +104,12 @@ const TeamView = async ({
                             <h1 className="text-normal font-bold">
                                 Name
                             </h1>
-                            <span className="font-normal mt-2 mb-4">{result[0].projectName}</span>
+                            <span className="font-normal mt-2 mb-4">{projectResult.data.project.name}</span>
                             <h1 className="text-normal font-bold">
                                 Description
                             </h1>
                             <p className="mt-2 mb-4">
-                                {result[0].projectDescription}
+                                {projectResult.data.project.description}
                             </p>
                         </>
                 }
@@ -122,11 +120,11 @@ const TeamView = async ({
                 </h1>
                 <Separator className="my-4" />
                 <div className="grid grid-cols-3 gap-4">
-                    {result.map((item, index) => (
+                    {projectResult.success &&  projectResult.data.project.media?.map((item, index) => (
                         <div key={index} className="p-2 mt-2 mb-4">
-                            <a target="_blank" href={item.projectMediaUrl} rel="noopener noreferrer">
+                            <a target="_blank" href={item.url} rel="noopener noreferrer">
                                 <Image
-                                    src={item.projectMediaUrl}
+                                    src={item.url}
                                     alt={"a image"}
                                     className="w-full h-auto"
                                     width={200}

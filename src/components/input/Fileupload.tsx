@@ -12,16 +12,22 @@ import { createProjectMedia } from '@/actions/projects';
 import { InsertProjectMediaSchema } from '@/db/schema';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
+import ErrorComp from '../Error';
+
 
 export default function Fileupload() {
-    const [fileStates, setFileStates] = useState<FileState[]>([]);
-    const { edgestore } = useEdgeStore();
-    const searchParams = useSearchParams();
-    const router = useRouter();
-                
-    const projectId = searchParams.get('projectId');
 
-    if(projectId === null) return <div>You have not submitted project name and description</div>
+    const [fileStates, setFileStates] = useState<FileState[]>([]);
+
+    const { edgestore } = useEdgeStore();
+
+    const searchParams = useSearchParams();
+
+    const projectId = searchParams.get("pid");
+
+
+    if(!projectId) 
+        return <ErrorComp message='No project description found'/>
 
     function updateFileProgress(key: string, progress: FileState['progress']) {
         setFileStates((fileStates) => {
@@ -64,22 +70,26 @@ export default function Fileupload() {
                                     mediaType: 'IMAGE',
                                 }
 
-                                const {error, result} = await createProjectMedia(JSON.stringify(media))
+                                const projectMediaResult = await createProjectMedia(JSON.stringify(media))
 
-                                if(error){
+                                if(!projectMediaResult.success){
+                                    const { error } = projectMediaResult;
                                     throw new Error(error)
                                 }
-
-                                toast({
-                                    title: "Success",
-                                    description: "File uploaded successfully",
-                                })
                 
                             } catch (err) {
                                 updateFileProgress(fileState.key, 'ERROR');
+                                toast({
+                                    title: "Error",
+                                    description: `File ${fileState.key} could not be uploaded`,
+                                })
                             }
                         }),
                     );
+                    toast({
+                        title: "Success",
+                        description: `Files uploaded successfully`,
+                    })
                 }}>
                     Upload
                 </Button>

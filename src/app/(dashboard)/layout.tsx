@@ -3,12 +3,15 @@ import Navbar from "@/components/navbar/Navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { EdgeStoreProvider } from "@/lib/edgestore";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
   }: Readonly<{
     children: React.ReactNode;
   }>) {
+
     return (
         <div className="h-screen flex">
             <SidebarProvider>

@@ -1,0 +1,2 @@
+ALTER TABLE "teams" ADD COLUMN "project_description_submitted" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "teams" ADD COLUMN "project_media_submitted" boolean DEFAULT false NOT NULL;

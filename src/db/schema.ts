@@ -24,7 +24,9 @@ export const teams = pgTable("teams", {
     name: varchar("name").notNull(),
     eventId: uuid("event_id").notNull().references(() => events.id, { onDelete: 'cascade' }),
     banned: boolean("banned").default(false).notNull(),
-    evaluated: boolean("evaluated").default(false).notNull() 
+    evaluated: boolean("evaluated").default(false).notNull(),
+    projectDescriptionSubmitted: boolean("project_description_submitted").default(false).notNull(),
+    projectMediaSubmitted: boolean("project_media_submitted").default(false).notNull()
 });
 
 export const students = pgTable("students", {

@@ -25,15 +25,12 @@ const TeamView = async ({
     if(!getTeamInfoResult.success) return (
         <div>
             {getTeamInfoResult.error}
-        </div>
-    
+        </div>  
     )
 
     const { team } = getTeamInfoResult.data;
 
     const projectResult = await getProjectByTeamId(teamId);
-
-    console.log(projectResult)
 
     return (
         <div className="grow shadow-custom p-4 rounded-lg text-xl">

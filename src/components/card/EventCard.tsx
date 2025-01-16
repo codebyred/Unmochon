@@ -36,18 +36,18 @@ const EventItem = async (props: EventItemProps) => {
     )
 
     return (
-        <Card className="flex flex-col justify-between w-[340px] h-[360px]">
+        <Card className="flex flex-col justify-between w-full max-w-sm h-auto p-4 bg-white shadow-md rounded-lg sm:max-w-md md:max-w-lg lg:max-w-[340px]">
             <CardHeader>
                 <CardTitle className="overflow-hidden h-[100px]">{event.name}</CardTitle>
                 <Separator/>
             </CardHeader>
-            <CardContent className="flex h-[160px] overflow-y-hidden">
-                <p className="text-red-500 flex items-center gap-2 text-normal">
+            <CardContent className="flex flex-col h-auto max-h-[200px] flex-grow overflow-x-hidden">
+                <p className="text-red-500 flex items-center gap-2 text-sm sm:text-base">
                     <AiOutlineExclamationCircle/>Registration deadline: {format(event.registrationDeadline, "PPP hh:mm aa")}
                 </p>             
             </CardContent>
-            <CardFooter className="flex flex-col items-center justify-center">
-                <Button asChild>
+            <CardFooter className="flex flex-col items-center justify-center mt-4">
+                <Button asChild className="w-full max-w-[200px]">
                     <Link href={
                         hasPermission(user, "update:events")?`/events/${event.id}/update`
                         :hasPermission(user,"view:events")?`/events/${event.id}`

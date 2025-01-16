@@ -7,6 +7,7 @@ import { hasPermission } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { v4 } from "uuid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { redirect } from "next/navigation";
 
 
 
@@ -15,9 +16,7 @@ const Events = async () => {
     const [error, events] = await getEvents();
     const user = await currentUser()
 
-    if (!user) return (
-        <div>Please sign in</div>
-    )
+    if (!user) redirect("/sigin")
 
     if (error || events === null) return (
         <div>An error occured or no events found</div>
@@ -79,7 +78,7 @@ async function RegisteredEvents() {
             data.events.map((event) => {
 
                 return <EventCard
-                    key={v4()}
+                    key={Math.floor(Math.random() * 1111 + 1)}
                     event={event}
                 />
             })

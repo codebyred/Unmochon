@@ -9,6 +9,8 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarGroupContent,
+    SidebarSeparator,
+    SidebarFooter,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link";
@@ -18,20 +20,25 @@ import { currentUser } from "@clerk/nextjs/server";
 import { isEventOrganizer, isFaculty, isStudent } from "@/lib/auth";
 import StudentMenu from "./StudentMenu";
 import FacultyMenu from "./FacultyMenu";
+import { redirect } from "next/navigation";
+import { SignOutButton, UserButton, UserProfile } from "@clerk/nextjs";
+import { GoSignOut } from "react-icons/go";
+import { CgProfile } from "react-icons/cg";
+import ProfileButton from "./ProfileButton";
 
 type SidebarProps = React.ButtonHTMLAttributes<HTMLButtonElement>
 
-const AppSidebar = async({ className }: SidebarProps) => {
+const AppSidebar = async ({ className }: SidebarProps) => {
 
     const user = await currentUser();
 
-    if(!user) return (
-        <></>
+    if (!user) return (
+        redirect("/signin")
     )
 
     return (
-        <Sidebar className={cn("flex flex-col", className)}>
-            <SidebarHeader className={cn("h-[20%] flex items-center justify-center")}>
+        <Sidebar>
+            <SidebarHeader className={cn("")}>
                 <Image
                     src="/unmochon_logo.png"
                     width={150}
@@ -39,20 +46,21 @@ const AppSidebar = async({ className }: SidebarProps) => {
                     alt="Unmochon Logo"
                 />
             </SidebarHeader>
+            <SidebarSeparator />
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {
-                                isEventOrganizer(user)?
-                                <OrganizerMenu/>
-                                :isStudent(user)?
-                                <StudentMenu/>
-                                :isFaculty(user)?
-                                <FacultyMenu/>
-                                :<></>
-                            }     
+                                isEventOrganizer(user) ?
+                                    <OrganizerMenu />
+                                    : isStudent(user) ?
+                                        <StudentMenu />
+                                        : isFaculty(user) ?
+                                            <FacultyMenu />
+                                            : <></>
+                            }
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -66,6 +74,23 @@ const AppSidebar = async({ className }: SidebarProps) => {
                                         <MdHistory />
                                         <span>History</span>
                                     </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                
+                                <ProfileButton/>
+                                
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild className={cn("hover:bg-slate-100")}>
+                                    <div>
+                                        <SignOutButton>
+                                            <div className="flex items-center gap-2">
+                                                <GoSignOut/>
+                                                <span> Sign out</span>
+                                            </div>
+                                        </SignOutButton>
+                                    </div>  
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>

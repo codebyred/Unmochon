@@ -8,8 +8,13 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { currentUser } from "@clerk/nextjs/server"
-import TeamTableActions from "./TeamTableActions"
-import { isEventOrganizer, isStudent } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import { getFaculty, getStudent } from "@/actions/roles"
+import { Button } from "../ui/button"
+import Link from "next/link"
+import { UnbanButton } from "../button/UnbanTeamButton"
+import { BanButton } from "../button/BanTeamButton"
+import { DeleteTeamButton } from "../button/DeleteTeamButton"
 
 type Data = {
     teamId: string
@@ -24,18 +29,12 @@ type TeamTableProps = {
 
 export const TeamTable = async (props: TeamTableProps) => {
 
-    const user = await currentUser();
+    const user = await currentUser()
 
-    if (!user) return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Team Name</TableHead>
-                    <TableHead>Event Name</TableHead>
-                </TableRow>
-            </TableHeader>
-        </Table>
-    )
+    if (!user) redirect("/sigin")
+
+    const studentResult = await getStudent(user);
+    const facultyResult = await getFaculty(user);
 
     return (
         <Table className="overflow-hidden">
@@ -51,14 +50,29 @@ export const TeamTable = async (props: TeamTableProps) => {
                     <TableRow key={item.teamId}>
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
-                        <TableCell>
-                            <TeamTableActions
-                                teamId={item.teamId}
-                                user={
-                                    isStudent(user)?"student": isEventOrganizer(user)?"organizer":"faculty"
-                                }
-                                isBanned={item?.isBanned}
-                            />
+                        <TableCell className="flex gap-2">
+                            <Button asChild>
+                                <Link href={`/teams/${item.teamId}`}>
+                                    View
+                                </Link>
+                            </Button>
+                            {
+                                facultyResult.success && item.isBanned?
+                                    <UnbanButton
+                                        teamId={item.teamId}
+                                    /> :
+                                    <BanButton
+                                        teamId={item.teamId}
+                                    />
+
+                            }
+                            {
+                                facultyResult.success && <DeleteTeamButton
+                                    teamId={item.teamId}
+                                    label="Kick"
+                                />
+                            }
+
                         </TableCell>
                     </TableRow>
                 ))}

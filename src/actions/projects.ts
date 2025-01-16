@@ -129,7 +129,7 @@ export async function getProjectByTeamId(teamId: string): Promise<ProjectsByTeam
             .innerJoin(events, eq(events.id, projects.eventId))
             .where(eq(projects.teamId, teamId));
 
-        console.log(rows)
+
         if(rows.length === 0) {
             throw new ValidationError("No project submitted by team")
         }

@@ -380,45 +380,47 @@ export async function evaluateTeam(previousState: unknown, data: string): Promis
         const sql = neon(process.env.DATABASE_URL!);
 
         const rawData = JSON.parse(data);
-        console.log(rawData)
-        const { success, data: EvaluationData, error } = InsertEvaluationSchema.safeParse(rawData);
+
+        const { success, data: evaluationData, error } = InsertEvaluationSchema.safeParse(rawData);
 
         if (!success) {
             throw new Error(error.message);
         }
 
-        if (!EvaluationData.teamId) {
+        if (!evaluationData.teamId) {
             throw new Error("Team ID is required");
         }
 
-        if(!EvaluationData.evaluatorId) {
+        if(!evaluationData.evaluatorId) {
             throw new Error("Evaluator Id is required")
         }
 
 
         await db.transaction(async (tx)=>{
 
-            if (!EvaluationData.teamId) {
+            if (!evaluationData.teamId) {
                 throw new Error("Team ID is required");
             }
     
-            if(!EvaluationData.evaluatorId) {
+            if(!evaluationData.evaluatorId) {
                 throw new Error("Evaluator Id is required")
             }
 
             await tx.insert(evaluations).values({
-                teamId: EvaluationData.teamId,
-                evaluatorId: EvaluationData.evaluatorId,
-                presentationScore: EvaluationData.presentationScore,
-                outcomeScore: EvaluationData.outcomeScore,
-                technologyScore: EvaluationData.technologyScore,
+                teamId: evaluationData.teamId,
+                evaluatorId: evaluationData.evaluatorId,
+                presentationScore: evaluationData.presentationScore,
+                outcomeScore: evaluationData.outcomeScore,
+                technologyScore: evaluationData.technologyScore,
             });
 
-            await tx.update(teams).set({ evaluated: true }).where(eq(teams.id, EvaluationData.teamId));
+            await tx.update(teams).set({ evaluated: true }).where(eq(teams.id, evaluationData.teamId));
 
-        })
+        });
 
-        return { success: true, data: { id: EvaluationData.teamId } }
+        revalidatePath(`/teams/${evaluationData.teamId}`)
+
+        return { success: true, data: { id: evaluationData.teamId } }
 
     } catch (err) {
 

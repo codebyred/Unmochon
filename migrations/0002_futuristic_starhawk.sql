@@ -1,0 +1,1 @@
+ALTER TABLE "faculty" ADD COLUMN "organizer" boolean DEFAULT false NOT NULL;

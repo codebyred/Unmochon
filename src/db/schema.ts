@@ -67,7 +67,8 @@ export const facutly = pgTable("faculty",{
     email: varchar("email").notNull(),
     name: varchar("name").notNull(),
     department: varchar("department").notNull(),
-    designation: designationEnum().notNull()
+    designation: designationEnum().notNull(),
+    organizer: boolean("organizer").default(false).notNull(),
 },(table) =>{
     return {
       emailIdx: uniqueIndex("faculty_email_idx").on(table.email)

@@ -1,16 +1,15 @@
 import { getAllTeams, getMyTeams } from "@/actions/teams";
 import { currentUser } from "@clerk/nextjs/server";
 import TeamTable from "@/components/table/TeamTable";
-import { hasPermission, isEventOrganizer, isFaculty, isStudent } from "@/lib/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getFaculty, getStudent } from "@/actions/roles";
+import { redirect } from "next/navigation";
 
 const Teams = async ()=>{
 
     const user = await currentUser();
 
-    if(!user) return (
-        <div>You are not signed in</div>
-    )
+    if(!user) redirect("/signin")
 
     const {error, result} = await getAllTeams();
 
@@ -26,21 +25,41 @@ const Teams = async ()=>{
         </div>
     )
 
+    const studentResult = await getStudent(user);
+    const facultyResult = await getFaculty(user);
+
+    if(studentResult.success) {
+
+        const { data } = studentResult;
+
+        return (
+            <div className="p-4 grow shadow-custom rounded-lg">
+                <TeamsTabForStudent studentEmail={user.emailAddresses.at(0)?.emailAddress as string}/>      
+            </div>
+        )
+
+    }
+    else if(facultyResult.success) {
+
+        const { data } = facultyResult
+
+        return (
+            <div className="p-4 grow shadow-custom rounded-lg">
+
+                <TeamsTabForFaculty/>
+                  
+            </div>
+        )
+    }
+
     return (
         <div className="p-4 grow shadow-custom rounded-lg">
-            {
-                isEventOrganizer(user)?
-                    <TeamsTabForOrganizer/>
-                    :isFaculty(user)?
-                        <TeamsTabForFaculty/>
-                        :isStudent(user)?
-                            <TeamsTabForStudent studentEmail={user.emailAddresses.at(0)?.emailAddress as string}/>
-                            :<div></div>
-            }          
         </div>
     )
 
 }
+
+export default Teams;
 
 type MyTeamsTab = {
     studentEmail: string
@@ -102,53 +121,19 @@ async function TeamsTabForFaculty() {
     return (
         <Tabs defaultValue="all" className="">
             <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="graded">Graded</TabsTrigger>
+                <TabsTrigger value="all">All</TabsTrigger> 
                 <TabsTrigger value="ungraded">Ungraded</TabsTrigger>
+                <TabsTrigger value="banned">Banned</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
                 <TeamTable data={result}/>
             </TabsContent>
-            <TabsContent value="graded">
-                <TeamTable data={result.filter((team)=> team.isEvaluated)}/>
-            </TabsContent>
             <TabsContent value="ungraded">
                 <TeamTable data={result.filter((team)=> !team.isEvaluated)}/>
             </TabsContent>
-        </Tabs>
-    )
-}
-
-async function TeamsTabForOrganizer() {
-
-    const {error, result} = await getAllTeams();
-
-    if(error) return (
-        <div className="flex items-center justify-center grow">
-            {error}
-        </div>
-    )
-
-    if(!result) return (
-        <div className="flex items-center justify-center grow">
-            No teams available
-        </div>
-    )
-
-    return (
-        <Tabs defaultValue="all" className="">
-            <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="banned">Banned</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all">
-                <TeamTable data={result.filter(((team)=> !team.isBanned))}/>
-            </TabsContent>
             <TabsContent value="banned">
-                <TeamTable data={result.filter(((team)=> team.isBanned))}/>
+                <TeamTable data={result.filter((team)=> team.isBanned)}/>
             </TabsContent>
         </Tabs>
     )
 }
-
-export default Teams;

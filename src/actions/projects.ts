@@ -3,7 +3,8 @@
 import { db } from "@/db/drizzle";
 import { events, InsertProjectMediaSchema, InsertProjectSchema, projectMedia, projects, teams } from "@/db/schema";
 import { getMyTeamForEvent } from "./teams";
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
+
 
 class ValidationError extends Error {
     constructor(message: string) {
@@ -267,5 +268,36 @@ export async function createProjectMedia(data: string): Promise<ProjectMediaResu
             return { success: false, error: "An unexpected error occurred" };
         }
     }
+}
 
+type NumberOfProjectsResult = {
+    success: true
+    data: {
+        projects: {
+            count: number
+        }
+    }
+} | {
+    success: false
+    error: string
+}
+
+export async function numberOfProjects() {
+    try{
+        const rows = await db.select({count: count()}).from(projects);
+
+        return {
+            success: true,
+            data: {
+                projects: {
+                    count: rows.at(0)?.count as number
+                }
+            }
+        }
+    }catch(err) {
+        return {
+            success: false,
+            error: "An unexpected error occured"
+        }
+    }
 }

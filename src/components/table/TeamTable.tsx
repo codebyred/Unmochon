@@ -25,16 +25,14 @@ type Data = {
 
 type TeamTableProps = {
     data: Data[]
+    userRole: "Faculty" | "Organizer" | "Student"
 }
 
 export const TeamTable = async (props: TeamTableProps) => {
 
-    const user = await currentUser()
+    const {data, userRole} = props;
 
-    if (!user) redirect("/sigin")
-
-    const studentResult = await getStudent(user);
-    const facultyResult = await getFaculty(user);
+    console.log(userRole)
 
     return (
         <Table className="overflow-hidden">
@@ -46,7 +44,7 @@ export const TeamTable = async (props: TeamTableProps) => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {props.data.map((item) => (
+                {data.map((item) => (
                     <TableRow key={item.teamId}>
                         <TableCell>{item.teamName}</TableCell>
                         <TableCell>{item.eventName}</TableCell>
@@ -57,17 +55,20 @@ export const TeamTable = async (props: TeamTableProps) => {
                                 </Link>
                             </Button>
                             {
-                                facultyResult.success && item.isBanned?
-                                    <UnbanButton
-                                        teamId={item.teamId}
-                                    /> :
-                                    <BanButton
-                                        teamId={item.teamId}
-                                    />
+                                userRole === "Faculty" && item.isBanned &&
+                                <UnbanButton
+                                    teamId={item.teamId}
+                                /> 
+                            }
+                            {
+                                userRole === "Faculty" && !item.isBanned &&
+                                <BanButton
+                                    teamId={item.teamId}
+                                />
 
                             }
                             {
-                                facultyResult.success && <DeleteTeamButton
+                                userRole === "Faculty" && <DeleteTeamButton
                                     teamId={item.teamId}
                                     label="Kick"
                                 />

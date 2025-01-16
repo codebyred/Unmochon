@@ -1,13 +1,11 @@
 import Add from "@/components/Add";
 import { getEvents, getRegisteredEvents } from "@/actions/events";
-import { InsertEventSchema } from "@/db/schema";
 import AddItemCard from "@/components/card/AddItemCard";
 import EventCard from "@/components/card/EventCard";
-import { hasPermission, isEventOrganizer, isStudent } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
-import { v4 } from "uuid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { redirect } from "next/navigation";
+import { getFaculty, getStudent } from "@/actions/roles";
 
 
 
@@ -18,11 +16,14 @@ const Events = async () => {
 
     if (!user) redirect("/sigin")
 
+    const studentResult = await getStudent(user);
+    const facultyResult = await getFaculty(user);
+
     if (error || events === null) return (
         <div>An error occured or no events found</div>
     )
 
-    if (events.length === 0 && hasPermission(user, "add:events")) return (
+    if (events.length === 0 && facultyResult.success && facultyResult.data.organizer) return (
         <div className="flex items-center justify-center grow">
             <Add path="/events/create" />
         </div>
@@ -33,23 +34,35 @@ const Events = async () => {
             <Tabs defaultValue="all" className="">
                 <TabsList>
                     <TabsTrigger value="all">All</TabsTrigger>
-                    {isStudent(user) && <TabsTrigger value="registered">Registered</TabsTrigger>}
+                    {studentResult.success && <TabsTrigger value="registered">Registered</TabsTrigger>}
                     
                 </TabsList>
                 <TabsContent value="all">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 
                         {
-                            events.map((event) => {
+                            studentResult.success && events.map((event) => {
 
                                 return <EventCard
                                     key={Math.floor(Math.random()*1111 + 1)}
                                     event={{ ...event, id: event.id as string}}
+                                    userRole="Student"
                                 />
                             })
 
                         }
-                        {hasPermission(user, "add:events") && <AddItemCard href="/events/create" />}
+                        {
+                            facultyResult.success && events.map((event) => {
+
+                                return <EventCard
+                                    key={Math.floor(Math.random()*1111 + 1)}
+                                    event={{ ...event, id: event.id as string}}
+                                    userRole={facultyResult.data.organizer?"Organizer":"Faculty"}
+                                />
+                            })
+
+                        }
+                        {facultyResult.success && facultyResult.data.organizer && <AddItemCard href="/events/create" />}
                     </div>
                 </TabsContent>
                 <TabsContent value="registered">
@@ -81,6 +94,7 @@ async function RegisteredEvents() {
                 return <EventCard
                     key={Math.floor(Math.random() * 1111 + 1)}
                     event={event}
+                    userRole="Student"
                 />
             })
 

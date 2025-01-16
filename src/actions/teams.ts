@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db/drizzle";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { InsertEvaluationSchema, TeamSchema, evaluations, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -432,4 +432,36 @@ export async function evaluateTeam(previousState: unknown, data: string): Promis
 
     }
 
+}
+
+type NumberOfProjectsResult = {
+    success: true
+    data: {
+        teams: {
+            count: number
+        }
+    }
+} | {
+    success: false
+    error: string
+}
+
+export async function numberOfTeams() {
+    try{
+        const rows = await db.select({count: count()}).from(teams);
+
+        return {
+            success: true,
+            data: {
+                teams: {
+                    count: rows.at(0)?.count as number
+                }
+            }
+        }
+    }catch(err) {
+        return {
+            success: false,
+            error: "An unexpected error occured"
+        }
+    }
 }

@@ -46,7 +46,18 @@ const Teams = async ()=>{
         return (
             <div className="p-4 grow shadow-custom rounded-lg">
 
-                <TeamsTabForFaculty/>
+                {
+                    facultyResult.success && facultyResult.data.organizer &&
+                    <TeamsTabForFaculty
+                        isOrganizer={true}
+                    />
+                }
+                {
+                    facultyResult.success && !facultyResult.data.organizer &&
+                    <TeamsTabForFaculty
+                        isOrganizer={false}
+                    />
+                }
                   
             </div>
         )
@@ -84,26 +95,38 @@ async function TeamsTabForStudent(props: MyTeamsTab) {
                 <TabsTrigger value="my">My</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-                <TeamTable data={allTeams as {
-                    teamId: string;
-                    teamName: string;
-                    isBanned: boolean;
-                    eventName: string;
-                }[]}/>
+                <TeamTable 
+                    data={allTeams as {
+                        teamId: string;
+                        teamName: string;
+                        isBanned: boolean;
+                        eventName: string;
+                    }[]}
+                    userRole="Student"
+                />
             </TabsContent>
             <TabsContent value="my">
-                <TeamTable data={myTeams as {
-                    teamId: string;
-                    teamName: string;
-                    isBanned: boolean;
-                    eventName: string;
-                }[]}/>
+                <TeamTable 
+                    data={myTeams as {
+                        teamId: string;
+                        teamName: string;
+                        isBanned: boolean;
+                        eventName: string;
+                    }[]}
+                    userRole="Student"
+                />
             </TabsContent>
         </Tabs>
     )
 }
 
-async function TeamsTabForFaculty() {
+type TeamsTabForFacultyProps = {
+    isOrganizer: boolean
+}
+async function TeamsTabForFaculty(props: TeamsTabForFacultyProps) {
+
+    const { isOrganizer } = props;
+
     const {error, result} = await getAllTeams();
 
     if(error) return (
@@ -126,13 +149,22 @@ async function TeamsTabForFaculty() {
                 <TabsTrigger value="banned">Banned</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-                <TeamTable data={result}/>
+                <TeamTable 
+                    data={result}
+                    userRole={isOrganizer?"Organizer":"Faculty"}
+                />
             </TabsContent>
             <TabsContent value="ungraded">
-                <TeamTable data={result.filter((team)=> !team.isEvaluated)}/>
+                <TeamTable 
+                    data={result.filter((team)=> !team.isEvaluated)}
+                    userRole={isOrganizer?"Organizer":"Faculty"}
+                />
             </TabsContent>
             <TabsContent value="banned">
-                <TeamTable data={result.filter((team)=> team.isBanned)}/>
+                <TeamTable
+                    data={result.filter((team)=> team.isBanned)}
+                    userRole={isOrganizer?"Organizer":"Faculty"}
+                />
             </TabsContent>
         </Tabs>
     )

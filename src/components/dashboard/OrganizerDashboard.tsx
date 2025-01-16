@@ -1,18 +1,24 @@
-import { hasPermission, isEventOrganizer } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { Calendar } from "@/components/ui/calendar"
 import DashboardCard from "@/components/card/DashboardCard";
 import Analytics from "@/components/chart/Analytics";
 import { getEvents } from "@/actions/events";
 import { v4 } from "uuid";
+import { numberOfProjects } from "@/actions/projects";
+import { redirect } from "next/navigation";
+import { numberOfTeams } from "@/actions/teams";
 
 const OrganizerDashboard = async() => {
+
     const user = await currentUser();
+
+    if (!user) redirect("/signin")
+
     const [error,events] = await getEvents();
 
-    if (!user) return (
-        <div className="flex grow items-center justify-center">Please sign in</div>
-    )
+    const numberOfProjectsResult = await numberOfProjects();
+
+    const numberOfTeamsResult = await numberOfTeams();
 
     if(error || events === null) return (
         <div>An error occured or could not get events</div>
@@ -29,11 +35,11 @@ const OrganizerDashboard = async() => {
                     />
                     <DashboardCard
                         topic="Registered Teams"
-                        amount="0"
+                        amount={numberOfTeamsResult.success?`${numberOfTeamsResult.data?.teams.count}`:`0`}
                     />
                     <DashboardCard
                         topic="Submitted Projects "
-                        amount="0"
+                        amount={numberOfProjectsResult.success?`${numberOfProjectsResult.data?.projects.count}`:'0'}
                     /> 
                 </div>
                 <div>

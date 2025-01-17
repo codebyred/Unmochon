@@ -32,7 +32,6 @@ export const TeamTable = async (props: TeamTableProps) => {
 
     const {data, userRole} = props;
 
-    console.log(userRole)
 
     return (
         <Table className="overflow-hidden">

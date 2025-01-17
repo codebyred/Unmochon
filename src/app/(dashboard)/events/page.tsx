@@ -45,10 +45,10 @@ const Events = async () => {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 
                         {
-                            studentResult.success && events.map((event) => {
+                            studentResult.success && events.map((event, index) => {
 
                                 return <EventCard
-                                    key={Math.floor(Math.random()*1111 + 1)}
+                                    key={(index + 1) * 1000}
                                     event={{ ...event, id: event.id as string}}
                                     userRole="Student"
                                 />

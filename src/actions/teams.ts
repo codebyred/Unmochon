@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/db/drizzle";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, sql } from "drizzle-orm";
 import { InsertEvaluationSchema, TeamSchema, evaluations, events, projectMedia, projects, students, teamMembers, teams } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -464,4 +464,92 @@ export async function numberOfTeams() {
             error: "An unexpected error occured"
         }
     }
+}
+
+type ScoresResult = {
+    success: true
+    data: {
+        best: {
+            score: '20-30'
+            teams: number
+        },
+        good: {
+            score: '10-19'
+            teams: number
+        },
+        bad: {
+            score: '0-9'
+            teams: number
+        }
+    }
+} | {
+    success: false
+    error: {
+        message: string
+    }
+}
+export async function scores(): Promise<ScoresResult> {
+
+    try {
+        const rowsBest = await db.select({count: count()})
+            .from(evaluations)
+            .where(
+                sql`(${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) <= 30
+                and (${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) >= 20`
+            )
+
+        const rowsGood = await db.select({count: count()})
+            .from(evaluations)
+            .where(
+                sql`(${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) <= 19
+                and (${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) >= 10`
+            )
+
+        const rowsBad = await db.select({count: count()})
+            .from(evaluations)
+            .where(
+                sql`(${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) <= 9
+                and (${evaluations.presentationScore} 
+                + ${evaluations.technologyScore} 
+                + ${evaluations.outcomeScore}) >= 0`
+            )
+
+        return {
+            success: true,
+            data: {
+                best: {
+                    score: '20-30',
+                    teams: rowsBest.at(0)?.count?rowsBest.at(0)?.count as number:0
+                },
+                good: {
+                    score: '10-19',
+                    teams: rowsGood.at(0)?.count?rowsGood.at(0)?.count as number:0
+                },
+                bad: {
+                    score: '0-9',
+                    teams: rowsBad.at(0)?.count?rowsBad.at(0)?.count as number:0
+                }
+            }
+        };
+
+    }catch(err) {
+        return {
+            success: false,
+            error: {
+                message: "An expected error occured"
+            }
+        }
+    }
+       
+
 }

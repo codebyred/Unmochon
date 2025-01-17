@@ -10,7 +10,9 @@ import { RiTeamFill } from "react-icons/ri";
 import { FaProjectDiagram } from "react-icons/fa";
 import { IoMdInformationCircle } from "react-icons/io";
 import { FaImages } from "react-icons/fa";
-import Evaluation from "@/components/Evaluation";
+import { ErrorDiv } from "@/components/ErrorDiv";
+import { getFaculty } from "@/actions/roles";
+import EvaluationForm from "@/components/form/EvaluationForm";
 
 const TeamView = async ({
     params,
@@ -22,30 +24,34 @@ const TeamView = async ({
 
     const getTeamInfoResult = await getTeamInfo(teamId);  
 
-    if(!getTeamInfoResult.success) return (
-        <div>
-            {getTeamInfoResult.error}
-        </div>  
-    )
+    if(!getTeamInfoResult.success) return <ErrorDiv message={getTeamInfoResult.error}/>
 
     const { team } = getTeamInfoResult.data;
 
     const projectResult = await getProjectByTeamId(teamId);
+
+    const user = await currentUser();
+    
+    if(!user) redirect('/sigin')
+
+    const facultyResult = await getFaculty(user);
 
     return (
         <div className="grow shadow-custom p-4 rounded-lg text-xl">
             <div className="flex justify-between mb-4">
                 <BackButton /> 
                 {
-                    team.evaluation.status?
+                    team.evaluation.status &&
                     <span className="border border-orange-400 rounded-lg flex items-center justify-center p-2">
                         <label>Score: </label>
                         {team.evaluation.grade}/30
                     </span>
-                    :<Evaluation
-                        teamId={teamId}
-                    />   
+
                 }
+                {facultyResult.success && !team.evaluation.status && <EvaluationForm
+                    teamId={teamId}
+                    evaluatorId={facultyResult.data.id}
+                />}
             </div>
             <div className="mb-4 shadow-custom rounded-lg p-4">
                 <h1 className="text-2xl font-bold flex gap-2 items-center">

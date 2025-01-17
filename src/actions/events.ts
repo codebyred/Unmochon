@@ -109,13 +109,39 @@ export async function updateEvent(previousState: unknown, data: string): Promise
 
 }
 
-export async function getEvents():Promise<[Error | null, InsertEventSchema[] | null]> {
+
+type EventsResult ={
+  success: true
+  data: {
+    id: string
+    name: string
+    registrationDeadline: Date;
+    projectSubmissionDeadline: Date;
+    requirements: string;
+  }[]
+} | {
+  success: false
+  error: {
+    message: string
+  }
+}
+
+
+export async function getEvents():Promise<EventsResult> {
 
   try{
-    const events: InsertEventSchema[] = await db.query.events.findMany();
-    return [null, events];
+    const rows = await db.query.events.findMany();
+    return {
+      success: true,
+      data: rows
+    }
   }catch(err) {
-    return [new Error("Could not fetch events"), null]
+    return {
+      success: false,
+      error: {
+        message: "An expected error occured"
+      }
+    }
   }
 
 }

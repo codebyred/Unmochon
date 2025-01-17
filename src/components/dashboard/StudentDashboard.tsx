@@ -1,21 +1,30 @@
-"use client"
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Calendar, CalendarCurrentDate, CalendarDayView, CalendarMonthView, CalendarNextTrigger, CalendarPrevTrigger, CalendarTodayTrigger, CalendarViewTrigger, CalendarWeekView, CalendarYearView } from "../calendar/full-calendar";
+import { Calendar, CalendarDayView, CalendarMonthView, CalendarNextTrigger, CalendarPrevTrigger, CalendarTodayTrigger, CalendarViewTrigger, CalendarWeekView, CalendarYearView } from "../calendar/full-calendar";
+import { getEvents } from "@/actions/events";
+import { ErrorDiv } from "@/components/ErrorDiv"
 
-const StudentDashboard = () => {
+const StudentDashboard = async() => {
+
+    const eventsResult = await getEvents();
+
+    if(!eventsResult.success) return <ErrorDiv message={eventsResult.error.message}/>
+
+    const {data: events} = await eventsResult;
+
     return (
         <div className="p-4 shadow-custom rounded-lg">
             <Calendar
-                events={[
-                    {
-                        id: '1',
-                        start: new Date(),
-                        end: new Date(),
-                        title: 'Meeting with John',
-                        color: 'pink',
-                    },
-                ]}
+                events={ events.map((event)=>{
+                        return  {
+                            id: event.id,
+                            start: event.registrationDeadline,
+                            end: event.projectSubmissionDeadline,
+                            title: event.name,
+                            color: 'pink',
+                        }
+                    })
+                }
             >
                 <div className="h-dvh py-6 flex flex-col">
                     <div className="flex px-6 items-center gap-2 mb-6">

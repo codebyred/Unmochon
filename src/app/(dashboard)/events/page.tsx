@@ -11,7 +11,7 @@ import { getFaculty, getStudent } from "@/actions/roles";
 
 const Events = async () => {
 
-    const [error, events] = await getEvents();
+    const eventsResult = await getEvents();
     const user = await currentUser()
 
     if (!user) redirect("/sigin")
@@ -19,9 +19,13 @@ const Events = async () => {
     const studentResult = await getStudent(user);
     const facultyResult = await getFaculty(user);
 
-    if (error || events === null) return (
-        <div>An error occured or no events found</div>
+    if (!eventsResult.success) return (
+        <div className="p-4 shadow-custom rounded-lg grow ">
+            {eventsResult.error.message}
+        </div>
     )
+
+    const { data: events } = eventsResult;
 
     if (events.length === 0 && facultyResult.success && facultyResult.data.organizer) return (
         <div className="flex items-center justify-center grow">

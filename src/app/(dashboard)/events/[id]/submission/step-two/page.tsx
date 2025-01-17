@@ -5,9 +5,7 @@ const ProjectSubmission = async()=> {
 
     return (
         <div className="grow p-4 shadow-custom rounded-lg">
-            <Fileupload
-            
-            />
+            <Fileupload/>
         </div>
     )
 }

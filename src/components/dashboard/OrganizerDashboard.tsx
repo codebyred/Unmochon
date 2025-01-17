@@ -7,6 +7,7 @@ import { v4 } from "uuid";
 import { numberOfProjects } from "@/actions/projects";
 import { redirect } from "next/navigation";
 import { numberOfTeams } from "@/actions/teams";
+import { ErrorDiv } from "../ErrorDiv";
 
 const OrganizerDashboard = async() => {
 
@@ -14,15 +15,15 @@ const OrganizerDashboard = async() => {
 
     if (!user) redirect("/signin")
 
-    const [error,events] = await getEvents();
+    const eventsResult = await getEvents();
 
     const numberOfProjectsResult = await numberOfProjects();
 
     const numberOfTeamsResult = await numberOfTeams();
 
-    if(error || events === null) return (
-        <div>An error occured or could not get events</div>
-    )
+    if(!eventsResult.success) return <ErrorDiv message={eventsResult.error.message}/>
+
+    const {data: events} = eventsResult
 
     return (
         <div className="flex p-4 grow">

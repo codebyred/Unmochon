@@ -12,7 +12,8 @@ import { createProjectMedia } from '@/actions/projects';
 import { InsertProjectMediaSchema } from '@/db/schema';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
-import ErrorComp from '../Error';
+import { ErrorDiv } from '../ErrorDiv';
+
 
 
 export default function Fileupload() {
@@ -25,9 +26,10 @@ export default function Fileupload() {
 
     const projectId = searchParams.get("pid");
 
+    const router = useRouter();
 
     if(!projectId) 
-        return <ErrorComp message='No project description found'/>
+        return <ErrorDiv message='No project description found'/>
 
     function updateFileProgress(key: string, progress: FileState['progress']) {
         setFileStates((fileStates) => {
@@ -89,7 +91,9 @@ export default function Fileupload() {
                     toast({
                         title: "Success",
                         description: `Files uploaded successfully`,
-                    })
+                    });
+
+                    router.push(`/success?msg=${'Project submission complete'}`)
                 }}>
                     Upload
                 </Button>

@@ -10,7 +10,12 @@ import { neon } from '@neondatabase/serverless';
 
 
 type CreateTeamResult = {
-    success: true
+    success: true,
+    data: {
+        team: {
+            id: string
+        }
+    }
 } | {
     success: false
     error: string
@@ -38,22 +43,45 @@ export async function createTeam(previouState: unknown, rawData: string): Promis
             throw new Error("Failed to create team");
         }
 
-        await db.insert(teamMembers).values(teamData
+        const rows = await db.insert(teamMembers).values(teamData
             .data.members.map((member) => {
                 return { teamId: teamId, memberId: member.id }
             }
-            ))
+        )).returning({id: teamMembers.teamId})
+
+        if(rows.length === 0) {
+            throw new Error("Failed to add members to team")
+        }
 
         revalidatePath('/teams');
 
         return {
             success: true,
+            data: {
+                team: {
+                    id: rows.at(0)?.id as string
+                }
+            }
         }
 
     } catch (e: unknown) {
-        return {
-            success: false,
-            error: (e instanceof Error) ? e.message : "An unexpected error occurred"
+
+        if(e instanceof Error && e.message.includes("violates foreign key constraint")) {
+            return {
+                success: false,
+                error: "Invalid member ID"
+            }
+        }
+        else if(e instanceof Error) {
+            return {
+                success: false,
+                error: e.message
+            }
+        }else {
+            return {
+                success: false,
+                error: "An unexpected error occurred"
+            }
         }
 
     }

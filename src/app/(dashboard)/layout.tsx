@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import NavbarTitle from "@/components/navbar/NavbarTitle";
 
 export default async function DashboardLayout({
     children,
@@ -19,6 +20,7 @@ export default async function DashboardLayout({
               <div className="grow flex flex-col">
                 <Navbar/>
                 <main className="p-4 grow flex flex-col">
+                  <NavbarTitle/>
                   <EdgeStoreProvider>
                   {children}
                   </EdgeStoreProvider>  

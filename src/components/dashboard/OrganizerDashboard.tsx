@@ -26,7 +26,7 @@ const OrganizerDashboard = async() => {
     const {data: events} = eventsResult
 
     return (
-        <div className="flex p-4 grow">
+        <div className="flex p-4 grow shadow-custom rounded-lg">
             {/*LEFT */}
             <div className="flex flex-col grow mr-4">
                 <div className="flex justify-between">

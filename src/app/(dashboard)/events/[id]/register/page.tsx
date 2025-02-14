@@ -15,7 +15,7 @@ const EventRegistration = async ({
 
     if (!result.success) return (
         <div className="p-4 grow shadow-custom rounded-lg">
-            {result.error}
+            {result.error.message}
         </div>
     )
 

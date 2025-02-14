@@ -36,7 +36,7 @@ const PieChartComponent = (props: PieChartProps)=>{
   const {chartConfig, chartData, totalTeams} = props;
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col grow">
       <CardHeader className="items-center pb-0">
         <CardTitle>Scores</CardTitle>
         <CardDescription>Project showcase event</CardDescription>

@@ -54,7 +54,7 @@ const ProjectForm = (props: ProjectFormProps) => {
                 title: "Success",
                 description: "Project submitted successfully" 
             })
-            router.push(`/projects/submission`)
+            router.push(`/events/${eventId}/submission`)
         } 
 
     }, [result]);

@@ -1,14 +1,6 @@
 "use client"
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { format } from "date-fns"
@@ -36,6 +28,8 @@ import { useRouter } from "next/navigation"
 import { TimePicker } from "@/components/timepicker/Timepicker"
 import { toast } from "@/hooks/use-toast"
 import { MagicBackButton } from "@/components/button/MagicBackButton"
+import { DeleteEventButton } from "../button/DeleteEventButton"
+
 
 type UpdateEventFormProps = {
     event: {
@@ -89,10 +83,8 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
 
     async function onSubmit(values: InsertEventSchema) {
 
-        startTransition(async () => {
-            
+        startTransition(async () => {         
             await formAction(JSON.stringify(values))
-
         });
 
     }
@@ -269,54 +261,5 @@ const UpdateEventForm = (props: UpdateEventFormProps) => {
     );
 }
 
-type DeleteButtonProps = {
-    itemId: string
-}
-
-const DeleteEventButton = (props: DeleteButtonProps) => {
-
-    const [error, formAction, isPending] = useActionState(deleteEvent, null);
-
-    function handleClick() {
-        startTransition(() => {
-            formAction(props.itemId);
-            toast({ description: `Event deleted successfully` })
-        })
-    }
-
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button
-                    variant={"destructive"}
-                >
-                    delete
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Are you absolutely sure?</DialogTitle>
-                    <DialogDescription>
-                        This action cannot be undone. This will permanently delete this item.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="flex items-center flex-end gap-4">
-                    <Button
-                        variant={"destructive"}
-                        onClick={async () => handleClick()}
-                    >
-                        yes
-                    </Button>
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                            Close
-                        </Button>
-                    </DialogClose>
-                </div>
-            </DialogContent>
-        </Dialog>
-
-    );
-}
 
 export default UpdateEventForm;

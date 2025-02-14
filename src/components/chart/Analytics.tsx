@@ -41,8 +41,7 @@ const Analytics = async(props: AnalyticsProps) => {
     } satisfies ChartConfig
 
     return (
-        <div className={cn("flex flex-row gap-4", props.className)}>
-            <BarChart/>
+        <div className={cn("flex flex-row grow", props.className)}>
             <PieChart
                 chartConfig={pieChartConfig}
                 chartData={pieChartData}

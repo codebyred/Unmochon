@@ -16,7 +16,7 @@ const HamburgerMenu = ()=> {
       } = useSidebar()
 
     return (
-        <div className="block md:hidden">
+        <div className="">
             <IoMenuSharp 
                 className="w-5 h-5"
                 onClick={()=> toggleSidebar()}

@@ -28,7 +28,7 @@ const drizzleClient = (datasourceUrl: string | undefined) => {
   };
 
   if (!connectionString) {
-    return null as any as ReturnType<typeof client>;
+    return null as unknown as ReturnType<typeof client>;
   }
 
   return client();

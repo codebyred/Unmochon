@@ -1,5 +1,7 @@
 "use client"
 
+import { deleteEvent } from "@/actions/events";
+import { toast } from "@/hooks/use-toast";
 import { startTransition, useActionState, useEffect } from "react";
 import {
     Dialog,
@@ -10,42 +12,40 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { toast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
-import Link from "next/link";
-import { banTeam, unbanTeam, deleteTeam } from "@/actions/teams"
 import { useRouter } from "next/navigation";
 
-
 type DeleteButtonProps = {
-    teamId: string
-    label?: string
+    itemId: string
 }
 
-export function DeleteTeamButton(props: DeleteButtonProps) {
+export const DeleteEventButton = (props: DeleteButtonProps) => {
 
-    const teamId = props.teamId;
-    const label = props.label;
+    const router = useRouter();
 
-    const [data, formAction, isPending] = useActionState(deleteTeam, null);
+    const [result, formAction, isPending] = useActionState(deleteEvent, null);
 
     useEffect(() => {
-        if(data?.error){
+        if (result && !result.success){
             toast({
                 title: "Error",
-                description: data?.error
-            });
-        }else if(data?.result){
-            toast({
-                title: "Success",
-                description: "Team deleted successfully"
+                description: result.error.message, 
+                variant: "destructive" 
             })
         }
-    }, [data])
+        else if( result && result.success) {
+            toast({
+                title: "Success",
+                description: "Event deleted successfully"
+            })
+            router.push(`/events`)
+        }
+        
+    }, [result, router]);
 
     function handleClick() {
-        startTransition(async() => {
-            await formAction(teamId);
+        startTransition(async () => {
+            await formAction(props.itemId);
         })
     }
 
@@ -55,25 +55,23 @@ export function DeleteTeamButton(props: DeleteButtonProps) {
                 <Button
                     variant={"destructive"}
                 >
-                    {label ? label : "Delete"}
+                    delete
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Are you absolutely sure?</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This team will be permanently removed.
+                        This action cannot be undone. This will permanently delete this item.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="flex items-center flex-end gap-4">
-                    <DialogClose asChild>
-                        <Button
-                            variant={"destructive"}
-                            onClick={async () => handleClick()}
-                        >
-                            yes
-                        </Button>
-                    </DialogClose>
+                <div className="flex items-center flex-end gap-4">              
+                    <Button
+                        variant={"destructive"}
+                        onClick={async () => handleClick()}
+                    >
+                        yes
+                    </Button>
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
                             Close
@@ -85,3 +83,4 @@ export function DeleteTeamButton(props: DeleteButtonProps) {
 
     );
 }
+

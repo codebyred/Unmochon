@@ -14,7 +14,7 @@ export default async function Home() {
         height={150}
         alt="Unmochon Logo"
       />
-      <SignIn forceRedirectUrl={"/home"} />
+      <SignIn/>
     </div>
   }
 

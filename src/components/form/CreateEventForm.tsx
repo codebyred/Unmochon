@@ -69,13 +69,8 @@ const AddEventForm = () => {
 
     async function onSubmit(values: InsertEventSchema) {
 
-        startTransition(async () => {
-            try{
-                await formAction(JSON.stringify(values));
-                toast({ description: "Event created successfully" })
-            }catch(err){
-                toast({description:"Could not create event", variant:"destructive"})
-            }
+        startTransition(async () => { 
+            await formAction(JSON.stringify(values));
         });
 
     }

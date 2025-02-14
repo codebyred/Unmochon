@@ -13,6 +13,7 @@ import { InsertProjectMediaSchema } from '@/db/schema';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { ErrorDiv } from '../ErrorDiv';
+import BackButton from '../button/BackButton';
 
 
 
@@ -47,7 +48,7 @@ export default function Fileupload() {
     return (
         <div className=''>   
             <div className='flex justify-between mb-4'>
-                <MagicBackButton/>
+                <BackButton/>
                 <Button onClick={async () => {
                     await Promise.all(
                         fileStates.map(async (fileState) => {
@@ -98,6 +99,10 @@ export default function Fileupload() {
                     Upload
                 </Button>
             </div> 
+            <div className='flex grow mb-4'>
+                You have submitted your project name and description. Now upload project screenshots to complete project submission,
+                You can upload maximum 6 images.
+            </div>
             <MultiImageDropzone
                 value={fileStates}
                 dropzoneOptions={{

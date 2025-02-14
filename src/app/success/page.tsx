@@ -12,18 +12,13 @@ const Success = ()=>{
 
     const success = searchparams.get('msg')
 
-    return <div className="flex flex-col grow"> 
-        <div className="grow flex justify-between mb-4">
-            <MagicBackButton/>
-            <div>
-
-            </div>
-        </div>
-        <div className="flex flex-col items-center justify-center">
+    return <div className="flex flex-col grow items-center justify-center h-full"> 
+        
             <CiCircleCheck className="text-8xl text-green-500"/>
             <label className="text-4xl text-green-500">Success</label>
             {success?success:""}
-        </div>  
+            <MagicBackButton/>
+        
     </div>
 }
 

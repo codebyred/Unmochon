@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import { loadEnvConfig } from '@next/env'
 
 export default defineConfig({
 

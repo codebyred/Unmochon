@@ -60,7 +60,12 @@ export async function createEvent(previousState: unknown, data: string): Promise
 
 type UpdateEventResult = {
   success: true;
-  data: string;
+  data: {
+    event: {
+      id: string
+      status: 'updated'
+    }
+  }
 } | {
   success: false;
   error: string;
@@ -96,7 +101,15 @@ export async function updateEvent(previousState: unknown, data: string): Promise
   
     revalidatePath('/events');
 
-    return {success: true, data: rows[0].id};
+    return {
+      success: true, 
+      data: {
+        event:{
+          id: rows[0].id,
+          status: 'updated'
+        }
+      }
+    };
 
   }catch(error) {
     if(error instanceof Error) {
@@ -159,42 +172,78 @@ type EventResult =
     }
   }
 }
-| { success: false; error: string };
+| { 
+  success: false 
+  error: {
+    message: string
+} };
 export async function getEvent(eventId: string): Promise<EventResult> {
 
   try {
 
     const rows = await db.select().from(events).where(eq(events.id, eventId));
 
+    if(rows.length === 0) { 
+      throw new Error("Event not foundd");
+    }
+
     return {success: true, data: {event: rows[0]}};
 
   } catch (error) {
-    if(error instanceof Error)
+    
       return {
         success: false,
-        error: error.message
+        error: {
+          message:error instanceof Error? error.message: "An unexpected error occurred"
+        }
       }
-    else
-      return {
-        success: false,
-        error: "An unexpected error occurred"
-      }
-  }
-  
+
+    }
 }
 
-export async function deleteEvent(previoudState:unknown, eventId: string){
+type DeleteEventResult = {
+  success: true
+  data: {
+    event: {
+      id: string
+      status: 'deleted'
+    }
+  }
+} | {
+  success: false
+  error: {
+    message: string
+  }
+}
 
+export async function deleteEvent(previoudState:unknown, eventId: string): Promise<DeleteEventResult> {
 
-  const result = await db.delete(events).where(sql`${events.id} = ${eventId}`).returning()
+  try{
+    const result = await db.delete(events).where(sql`${events.id} = ${eventId}`).returning()
 
-  if (result.length === 0) {
-    const error = encodeURIComponent("Could not delete event");
-    redirect(`/events?error=${error}`);
+    if (result.length === 0) {
+      throw new Error("Event could not be deleted or not found");
+    }
+
+    return {
+      success: true,
+      data: {
+        event: {
+          id: eventId,
+          status: "deleted"
+        }
+      }
+    }
+
+  }catch(err) {
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : "An unexpected error occurred"
+      }
+    }
   }
 
-  revalidatePath('/events');
-  redirect('/events');
 
 }
 

@@ -43,10 +43,6 @@ export function BanButton(props: BanButtonProps) {
     function handleClick() {
         startTransition(async () => {
             await formAction(teamId);
-            toast({ 
-                title: "Success",
-                description: `Team banned successfully` 
-            })
         })
     }
 

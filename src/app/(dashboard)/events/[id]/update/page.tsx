@@ -13,6 +13,8 @@ const EventPage = async ({
 
     const id = (await params).id
 
+    console.log(id);
+
     const result = await getEvent(id);
     const user = await currentUser();
 
@@ -26,12 +28,14 @@ const EventPage = async ({
         </div>
     )
 
-    const { data } = result;
+    const { event } = result.data;
+
+    console.log(event);
     return (
         <div className="grow p-4 shadow-custom rounded-lg" data-cy="addEvent-page">
 
             <UpdateEventForm
-                event={data.event}
+                event={ event }
             />
         
         </div>
